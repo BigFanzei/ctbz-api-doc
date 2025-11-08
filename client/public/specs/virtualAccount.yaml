@@ -1,0 +1,369 @@
+openapi: 3.0.4
+info:
+  title: Virtual Accounts API
+  version: 1.0.0
+  description: 管理虚拟账户（VA）及其资金活动的接口定义（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /customers/{customer_id}/virtual_accounts:
+    get:
+      summary: List VA by customer
+      description: 获取指定客户名下的所有虚拟账户（VA）
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/VirtualAccount' }
+    post:
+      summary: Create a VA
+      description: 为客户创建一个新的虚拟账户（VA）
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VirtualAccountCreate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualAccount'
+
+  /customers/{customer_id}/virtual_accounts/{virtual_account_id}:
+    get:
+      summary: Get a VA
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/VirtualAccountId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualAccount'
+    put:
+      summary: Update a VA
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/VirtualAccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VirtualAccountUpdate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualAccount'
+
+  /customers/{customer_id}/virtual_accounts/{virtual_account_id}/deactive:
+    post:
+      summary: Deactivate a VA
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/VirtualAccountId'
+      responses:
+        default:
+          description: Response
+
+  /customers/{customer_id}/virtual_accounts/{virtual_account_id}/reactive:
+    post:
+      summary: Reactivate a VA
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/VirtualAccountId'
+      responses:
+        default:
+          description: Response
+
+  /customers/{customer_id}/virtual_accounts/{virtual_account_id}/activities:
+    get:
+      summary: VA activities
+      description: 查询单一 VA 的交易事件与资金变动记录
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/VirtualAccountId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+        - $ref: '#/components/parameters/EventType'
+        - name: tx_hash
+          in: query
+          schema: { type: string }
+          description: 可选，根据链上交易哈希筛选
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/VAActivity' }
+
+  /virtual_accounts:
+    get:
+      summary: List VA (all customers)
+      description: 获取开发者下所有客户的虚拟账户列表
+      parameters:
+        - $ref: '#/components/parameters/Status'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+
+  /virtual_accounts/history:
+    get:
+      summary: VA activities across all customers
+      description: 获取开发者下所有客户的 VA 事件与活动历史
+      parameters:
+        - name: tx_hash
+          in: query
+          schema: { type: string }
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+        - $ref: '#/components/parameters/EventType'
+        - $ref: '#/components/parameters/UpdatedAfterMs'
+        - $ref: '#/components/parameters/UpdatedBeforeMs'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/VAActivity' }
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  parameters:
+    CustomerId:
+      name: customer_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+      description: 客户 UUID
+    VirtualAccountId:
+      name: virtual_account_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+      description: 虚拟账户 UUID
+    Limit:
+      name: limit
+      in: query
+      description: 返回的条数限制（10–100）
+      schema: { type: integer, minimum: 10, maximum: 100, default: 10 }
+    StartingAfter:
+      name: starting_after
+      in: query
+      schema: { type: string }
+      description: 在此 ID 之后的记录
+    EndingBefore:
+      name: ending_before
+      in: query
+      schema: { type: string }
+      description: 在此 ID 之前的记录
+    Status:
+      name: status
+      in: query
+      schema:
+        type: string
+        enum: [active, deactive]
+      description: 虚拟账户状态筛选
+    EventType:
+      name: event_type
+      in: query
+      schema:
+        type: string
+        enum:
+          [
+            funds_scheduled,
+            funds_received,
+            payment_submitted,
+            payment_processed,
+            in_review,
+            refund,
+            microdeposit,
+            account_update,
+            deactivation,
+            activation
+          ]
+      description: VA 事件类型筛选
+    UpdatedAfterMs:
+      name: updated_after_ms
+      in: query
+      schema: { type: integer, format: int64 }
+    UpdatedBeforeMs:
+      name: updated_before_ms
+      in: query
+      schema: { type: integer, format: int64 }
+
+  schemas:
+    VAStatus:
+      type: string
+      enum: [active, deactive]
+    PaymentRail:
+      type: string
+      enum: [wire, ach, card, bank_transfer, blockchain]
+    TokenCurrency:
+      type: string
+      enum: [usdc, usdt, usd]
+
+    VirtualAccount:
+      type: object
+      required: [id, status, customer_id, created_at]
+      properties:
+        id: { type: string, format: uuid, description: VA ID }
+        status: { $ref: '#/components/schemas/VAStatus' }
+        developer_fee_percent: { type: string, description: 开发者费率（bps） }
+        customer_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        source_deposit_instructions:
+          type: object
+          properties:
+            payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+            currency: { $ref: '#/components/schemas/TokenCurrency' }
+            bank_name: { type: string }
+            bank_address: { type: string }
+            bank_routing_number: { type: string }
+            bank_account: { type: string }
+            beneficiary_name: { type: string }
+            beneficiary_address: { type: string }
+            holder_name: { type: string }
+        destination:
+          type: object
+          properties:
+            currency: { $ref: '#/components/schemas/TokenCurrency' }
+            payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+            address: { type: string }
+            blockchain_memo: { type: string }
+            evonet_wallet_id: { type: string, format: uuid }
+            prefund_id: { type: string, format: uuid }
+
+    VirtualAccountCreate:
+      type: object
+      required: [source, destination]
+      properties:
+        source:
+          type: object
+          properties:
+            currency: { $ref: '#/components/schemas/TokenCurrency' }
+        destination:
+          type: object
+          properties:
+            currency: { $ref: '#/components/schemas/TokenCurrency' }
+            payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+            address: { type: string }
+            blockchain_memo: { type: string }
+            evonet_wallet_id: { type: string, format: uuid }
+            prefund_id: { type: string, format: uuid }
+        developer_fee_percent: { type: string }
+
+    VirtualAccountUpdate:
+      type: object
+      properties:
+        destination:
+          type: object
+          properties:
+            currency: { $ref: '#/components/schemas/TokenCurrency' }
+            payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+            address: { type: string }
+            blockchain_memo: { type: string }
+            evonet_wallet_id: { type: string, format: uuid }
+            prefund_id: { type: string, format: uuid }
+        developer_fee_percent: { type: string }
+
+    VAActivity:
+      type: object
+      required: [id, type, customer_id, virtual_account_id, created_at]
+      properties:
+        id: { type: string, format: uuid, description: 事件 ID }
+        type: { $ref: '#/components/parameters/EventType/schema' }
+        customer_id: { type: string, format: uuid }
+        virtual_account_id: { type: string, format: uuid }
+        amount: { type: string }
+        currency: { $ref: '#/components/schemas/TokenCurrency' }
+        developer_fee_amount: { type: string }
+        exchange_fee_amount: { type: string }
+        subtotal_amount: { type: string }
+        gas_fee: { type: string }
+        deposit_id: { type: string, format: uuid }
+        destination_tx_hash: { type: string }
+        destination_payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+        created_at: { type: string, format: date-time }
+        source:
+          type: object
+          properties:
+            payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+            description: { type: string }
+            sender_name: { type: string }
+            sender_bank_routing_number: { type: string }
+            trace_number: { type: string }
+            routing_number: { type: string }
+            bank_name: { type: string }
+            bank_account: { type: string }
+            beneficiary_name: { type: string }
+            beneficiary_address: { type: string }
+            reference: { type: string }
+            tracking_number: { type: string }
+        receipt:
+          type: object
+          properties:
+            initial_amount: { type: string }
+            developer_fee: { type: string }
+            exchange_fee: { type: string }
+            subtotal_amount: { type: string }
+            remaining_prefunded_balance: { type: string }
+            final_amount: { type: string }
+            source_tx_hash: { type: string }
+            destination_tx_hash: { type: string }
+            exchange_rate: { type: string }
+            gas_fee: { type: string }
+            url: { type: string }

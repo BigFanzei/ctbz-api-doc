@@ -1,0 +1,322 @@
+openapi: 3.0.4
+info:
+  title: External Accounts API
+  version: 1.0.0
+  description: 客户外部账户的查询、创建、更新、删除与激活
+
+servers:
+  - url: https://api.example.com
+  - url: https://sandbox.api.example.com
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /customers/{customer_id}/external_accounts:
+    get:
+      summary: Get all external accounts for a customer
+      description: 返回该客户名下的所有外部账户，支持分页
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExternalAccount'
+    post:
+      summary: Create a new external account for a customer
+      description: 为客户新增外部账户
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalAccountCreate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAccount'
+
+  /customers/{customer_id}/external_accounts/{external_account_id}:
+    get:
+      summary: Retrieve an external account
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/ExternalAccountId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAccount'
+    put:
+      summary: Update an external account
+      description: 仅更新指定字段（如地址、账户路由信息等）
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/ExternalAccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalAccountUpdate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAccount'
+    delete:
+      summary: Delete a single external account
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/ExternalAccountId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted: { type: boolean }
+                  id:
+                    type: string
+                    format: uuid
+
+  /customers/{customer_id}/external_accounts/{external_account_id}/reactivate:
+    post:
+      summary: Reactivate an external account
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/ExternalAccountId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalAccount'
+
+  /external_accounts:
+    get:
+      summary: Get all external accounts (all)
+      description: 平台维度列出所有外部账户，支持分页
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExternalAccount'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  parameters:
+    CustomerId:
+      name: customer_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    ExternalAccountId:
+      name: external_account_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 10, maximum: 100, default: 10 }
+      description: 返回条数限制（10–100）
+    StartingAfter:
+      name: starting_after
+      in: query
+      schema: { type: string }
+      description: 返回在该时间点/ID之后创建的账户
+    EndingBefore:
+      name: ending_before
+      in: query
+      schema: { type: string }
+      description: 返回在该时间点/ID之前创建的账户
+
+  schemas:
+    CurrencyCode:
+      type: string
+      description: 计价币种
+      enum: [usd, usdc, usdt]
+
+    AccountOwnerType:
+      type: string
+      enum: [individual, business]
+
+    Address:
+      type: object
+      properties:
+        street_line_1: { type: string }
+        street_line_2: { type: string }
+        city: { type: string }
+        country: { type: string }
+        postal_code: { type: string }
+
+    BankAccountDetails:
+      type: object
+      properties:
+        routing_number:
+          type: string
+          description: 不同国家/地区的路由号字段（本地化）
+        account_number:
+          type: string
+          description: 账户号（如适用）
+        bank_name:
+          type: string
+        iban:
+          type: string
+        bic:
+          type: string
+
+    SwiftDetails:
+      type: object
+      properties:
+        bic: { type: string }
+        iban: { type: string }
+        account_number: { type: string }
+        correspondent_bank: { type: string }
+
+    CardDetails:
+      type: object
+      description: 卡信息（视合规遮蔽，通常只存 token/指纹）
+      additionalProperties: true
+
+    ExternalAccount:
+      type: object
+      required:
+        - id
+        - customer_id
+        - currency
+        - account_owner_name
+        - account_owner_type
+        - created_at
+        - updated_at
+        - active
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 外部账户标识符
+        customer_id:
+          type: string
+          format: uuid
+          description: EVONET 系统内部用户 ID
+        currency:
+          $ref: '#/components/schemas/CurrencyCode'
+        account_owner_name:
+          type: string
+        account_type:
+          type: string
+          description: 账户类型，随国家/体系不同而异
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        active:
+          type: boolean
+        bank_account:
+          $ref: '#/components/schemas/BankAccountDetails'
+        swift:
+          $ref: '#/components/schemas/SwiftDetails'
+        card:
+          $ref: '#/components/schemas/CardDetails'
+        account_owner_type:
+          $ref: '#/components/schemas/AccountOwnerType'
+        first_name:
+          type: string
+        last_name:
+          type: string
+        business_name:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+
+    ExternalAccountCreate:
+      type: object
+      description: 创建外部账户的请求体
+      required:
+        - currency
+        - account_owner_name
+        - account_owner_type
+      properties:
+        currency:
+          $ref: '#/components/schemas/CurrencyCode'
+        account_owner_name:
+          type: string
+        account_owner_type:
+          $ref: '#/components/schemas/AccountOwnerType'
+        account_type:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        business_name:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        bank_account:
+          $ref: '#/components/schemas/BankAccountDetails'
+        swift:
+          $ref: '#/components/schemas/SwiftDetails'
+        card:
+          $ref: '#/components/schemas/CardDetails'
+
+    ExternalAccountUpdate:
+      type: object
+      description: 更新外部账户的请求体
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        account:
+          type: object
+          properties:
+            routing_number:
+              type: string
+              description: 账户路由号（字段遵循本地化规则）

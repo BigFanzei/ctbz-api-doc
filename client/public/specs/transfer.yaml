@@ -1,0 +1,364 @@
+openapi: 3.0.4
+info:
+  title: Transfers API
+  version: 1.0.0
+  description: 平台转账接口（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /transfers:
+    get:
+      summary: Get all transfers
+      description: 平台维度，按条件筛选并返回所有转账记录
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+        - name: tx_hash
+          in: query
+          schema: { type: string }
+          description: 匹配链上交易哈希
+        - name: updated_after_ms
+          in: query
+          schema: { type: integer, format: int64 }
+          description: 返回该毫秒时间戳（含）之后更新的交易
+        - name: updated_before_ms
+          in: query
+          schema: { type: integer, format: int64 }
+          description: 返回该毫秒时间戳（含）之前更新的交易
+        - name: state
+          in: query
+          description: 交易状态过滤
+          schema:
+            $ref: '#/components/schemas/TransferState'
+        - name: template_id
+          in: query
+          schema: { type: string, format: uuid }
+          description: 指定模板 ID，返回匹配该模板的转账
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count:
+                    type: integer
+                    description: 结果集大小
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transfer'
+    post:
+      summary: Create a transfer
+      description: 创建一笔转账
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferCreate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+
+  /transfers/{transfer_id}:
+    get:
+      summary: Get a transfer
+      parameters:
+        - $ref: '#/components/parameters/TransferId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+    put:
+      summary: Update a transfer
+      description: 仅允许在状态为 `awaiting_funds` 的交易上更新金额/费用等字段
+      parameters:
+        - $ref: '#/components/parameters/TransferId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferUpdate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+    delete:
+      summary: Delete a transfer
+      description: 仅允许在状态为 `awaiting_funds` 的交易上执行删除
+      parameters:
+        - $ref: '#/components/parameters/TransferId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted: { type: boolean }
+                  id:
+                    type: string
+                    format: uuid
+
+  /transfers/static_templates:
+    get:
+      summary: Get all static templates
+      description: 返回可用于转账的静态模板列表
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransferTemplate'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+      description: 返回项目数（默认 10，最多 100）
+    StartingAfter:
+      name: starting_after
+      in: query
+      schema: { type: string }
+      description: 返回该 ID 之后的结果
+    EndingBefore:
+      name: ending_before
+      in: query
+      schema: { type: string }
+      description: 返回该 ID 之前的结果
+    TransferId:
+      name: transfer_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  schemas:
+    # ------- Enums / Common -------
+    CurrencyCode:
+      type: string
+      description: 计价币种（法币或加密）
+      enum: [usd, usdc, usdt]
+
+    PaymentRail:
+      type: string
+      description: 支付轨道/链或支付通道
+      enum: [arbitrum, avalanche_c_chain, base, ethereum, optimism, polygon, solana, spei, stellar, Alipay, WeChat, Creditcard]
+
+    SwiftCharge:
+      type: string
+      description: SWIFT 手续费承担方式
+      enum: [our, sha, ben]
+
+    TransferState:
+      type: string
+      enum: [awaiting_funds, funds_received, payment_submitted, payment_processed, in_review, kyc_required, kyc_in_review, developer_kyb_required, canceled, error, returned, refunded, undeliverable]
+
+    # ------- Transfer Sub-objects -------
+    TransferSource:
+      type: object
+      properties:
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+        payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+        payment_scheme:
+          type: string
+          description: 支付方案（如 creditcard, QR 等）
+        external_account_id: { type: string, format: uuid }
+        evonet_wallet_id: { type: string, format: uuid }
+        tracking_number: { type: string }
+        from_address:
+          type: string
+          description: 稳定币出金的链上地址
+        bank_beneficiary_name: { type: string }
+        bank_beneficiary_address: { type: string }
+        bank_routing_number: { type: string }
+        bank_name: { type: string }
+        originator_name: { type: string }
+        originator_address: { type: string }
+        wire_message: { type: string }
+
+    TransferDestination:
+      type: object
+      properties:
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+        payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+        external_account_id: { type: string, format: uuid }
+        swift_charge: { $ref: '#/components/schemas/SwiftCharge' }
+        blockchain_memo:
+          type: string
+          description: 对于支持 memo 的链，转账附言
+        deposit_id: { type: string, format: uuid }
+        tracking_number: { type: string }
+        to_address:
+          type: string
+          description: 出金的链上地址
+        evonet_wallet_id: { type: string, format: uuid }
+
+    TransferReceipt:
+      type: object
+      properties:
+        initial_amount: { type: string }
+        developer_fee: { type: string }
+        exchange_fee: { type: string, description: EVONET 收益金额 }
+        subtotal_amount: { type: string }
+        remaining_prefunded_balance: { type: string }
+        gas_fee: { type: string }
+        final_amount: { type: string }
+        source_tx_hash: { type: string }
+        destination_tx_hash: { type: string }
+        exchange_rate: { type: string }
+        url: { type: string }
+
+    SourceDepositInstruction:
+      type: object
+      description: 需要客户先垫付资金时的指引
+      properties:
+        payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+        amount: { type: string }
+        currency: { type: string }
+        from_address: { type: string, description: payin crypto address }
+        to_address: { type: string, description: payout to crypto address }
+        deposit_message: { type: string }
+        bank_name: { type: string }
+        bank_address: { type: string }
+        bank_routing_number: { type: string }
+        bank_account_number: { type: string }
+        beneficiary_name: { type: string }
+        beneficiary_address: { type: string }
+        iban: { type: string }
+        bic: { type: string }
+        account_holder_name: { type: string }
+        blockchain_memo: { type: string }
+
+    ReturnDetail:
+      type: object
+      description: 转账被退回的原因
+      properties:
+        reason: { type: string }
+        refund_reference_id: { type: string }
+
+    # ------- Core Transfer -------
+    Transfer:
+      type: object
+      required: [id, amount, currency, state, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid, description: 转账 UUID }
+        amount: { type: string, description: 法币计价（字符串以避免精度丢失） }
+        currency: { type: string }
+        on_behalf_of: { type: string, format: uuid, description: 平台代哪个客户转账 }
+        developer_fee: { type: string }
+        developer_fee_percentage: { type: integer }
+        source: { $ref: '#/components/schemas/TransferSource' }
+        destination: { $ref: '#/components/schemas/TransferDestination' }
+        state: { $ref: '#/components/schemas/TransferState' }
+        receipt: { $ref: '#/components/schemas/TransferReceipt' }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        client_reference_id: { type: string, description: 开发者侧自定义引用 ID }
+        source_deposit_instruction: { $ref: '#/components/schemas/SourceDepositInstruction' }
+        return_detail: { $ref: '#/components/schemas/ReturnDetail' }
+
+    TransferCreate:
+      type: object
+      required: [on_behalf_of, amount, source, destination]
+      properties:
+        on_behalf_of:
+          type: string
+          format: uuid
+          description: 平台代表哪个客户进行的转账操作（客户 UUID）
+        source:
+          $ref: '#/components/schemas/TransferSource'
+        destination:
+          $ref: '#/components/schemas/TransferDestination'
+        id:
+          type: string
+          format: uuid
+          description: 可选的客户端生成 UUID（如提供将用于去重）
+        client_reference_id:
+          type: string
+          description: 开发者侧自定义引用 ID
+        amount:
+          type: string
+          description: 法币计价；如为加密资产将先换算为法币
+        developer_fee:
+          type: string
+          description: 开发者预留的手续费金额
+        developer_fee_percentage:
+          type: integer
+          description: 开发者预留手续费的百分比
+        features:
+          type: object
+          properties:
+            flexible_amount:
+              type: boolean
+              description: 允许转账金额可变；启用时固定金额与固定费额不生效
+            static_template:
+              type: boolean
+              description: 使用模板中定义的固定金额
+            allow_any_from_address:
+              type: boolean
+              description: 允许未知 from_address（如交易所出金场景）
+
+    TransferUpdate:
+      type: object
+      description: 仅在 `awaiting_funds` 状态下可更新
+      properties:
+        amount:
+          type: string
+          description: 法币计价金额
+        developer_fee:
+          type: string
+          description: 开发者预留手续费金额
+        developer_fee_percentage:
+          type: integer
+          description: 开发者预留手续费百分比
+
+    # ------- Templates -------
+    TransferTemplate:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        payload:
+          type: object
+          additionalProperties: true

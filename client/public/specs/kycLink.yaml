@@ -1,0 +1,213 @@
+openapi: 3.0.4
+info:
+  title: KYC Links API
+  version: 1.0.0
+  description: 个体与企业的 KYC 链接管理（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /kyc_links:
+    get:
+      summary: Get all KYC links
+      description: 按条件筛选并分页返回 KYC 链接
+      parameters:
+        - $ref: '#/components/parameters/CustomerIdQuery'
+        - $ref: '#/components/parameters/Email'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+        - $ref: '#/components/parameters/Limit10to100'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/KycLink'
+    post:
+      summary: Generate a link for an individual or business to perform KYC
+      description: 为个人或企业生成执行 KYC 的链接
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KycLinkCreateRequest'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KycLink'
+
+  /kyc_links/{kyc_link_id}:
+    get:
+      summary: Check status of a KYC link
+      description: 获取单个 KYC 链接的详细信息与状态
+      parameters:
+        - $ref: '#/components/parameters/KycLinkId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KycLink'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  parameters:
+    CustomerIdQuery:
+      name: customer_id
+      in: query
+      schema:
+        type: string
+        format: uuid
+      description: 按客户 UUID 过滤
+    Email:
+      name: email
+      in: query
+      schema:
+        type: string
+        format: email
+      description: 按邮箱过滤
+    StartingAfter:
+      name: starting_after
+      in: query
+      schema:
+        type: string
+      description: 过滤在指定 customer_id 创建“之后”的链接
+    EndingBefore:
+      name: ending_before
+      in: query
+      schema:
+        type: string
+      description: 过滤在指定 customer_id 创建“之前”的链接
+    Limit10to100:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 10
+        maximum: 100
+        default: 10
+      description: 返回条数限制（10–100）
+    KycLinkId:
+      name: kyc_link_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: KYC 链接 UUID
+
+  schemas:
+    KycType:
+      type: string
+      enum: [individual, business]
+
+    KycStatus:
+      type: string
+      enum:
+        [
+          not_started,
+          incomplete,
+          awaiting_ubo,
+          under_review,
+          approved,
+          rejected,
+          paused,
+          offboarded
+        ]
+
+    TosStatus:
+      type: string
+      enum: [pending, approved]
+
+    RejectReason:
+      type: object
+      properties:
+        developer_reason:
+          type: string
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    KycLink:
+      type: object
+      required:
+        - id
+        - type
+        - kyc_link
+        - kyc_status
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: KYC link ID
+        type:
+          $ref: '#/components/schemas/KycType'
+        customer_id:
+          type: string
+          format: uuid
+        full_name:
+          type: string
+        kyc_link:
+          type: string
+          format: uri
+        kyc_status:
+          $ref: '#/components/schemas/KycStatus'
+        reject_reason:
+          type: array
+          items:
+            $ref: '#/components/schemas/RejectReason'
+        tos_link:
+          type: string
+          format: uri
+        tos_status:
+          $ref: '#/components/schemas/TosStatus'
+        created_at:
+          type: string
+          format: date-time
+
+    KycLinkCreateRequest:
+      type: object
+      required: [email, type, full_name, redirect_url]
+      properties:
+        email:
+          type: string
+          format: email
+        type:
+          $ref: '#/components/schemas/KycType'
+        endorsement:
+          type: string
+          description: 背书类型
+        full_name:
+          type: string
+        redirect_url:
+          type: string
+          format: uri

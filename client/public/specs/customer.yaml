@@ -1,0 +1,794 @@
+openapi: 3.0.4
+info:
+  title: Customer & Transfer API
+  version: 1.0.0
+  description: 客户、关联人员、交易与链接相关接口（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /customers:
+    get:
+      summary: Get all customers
+      description: 分页获取客户列表
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count:
+                    type: integer
+                    description: 返回的数据集长度
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Customer'
+    post:
+      summary: Create a customer
+      description: 创建个人或企业客户
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          description: 幂等键
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/CustomerCreateIndividual'
+                - $ref: '#/components/schemas/CustomerCreateBusiness'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+  /customers/{customer_id}:
+    get:
+      summary: Get a single customer
+      description: 获取单个客户对象
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+    put:
+      summary: Update a single customer
+      description: 使用 PUT 更新客户信息；体结构与创建时一致（区分个人/企业）
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/CustomerCreateIndividual'
+                - $ref: '#/components/schemas/CustomerCreateBusiness'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+    delete:
+      summary: Delete a single customer
+      description: 删除单个客户对象
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                  id:
+                    type: string
+                    format: uuid
+
+  /customers/{customer_id}/associated_persons:
+    post:
+      summary: Create an associated person
+      description: 为客户新增关联人员（UBO/董事/签字人等）
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssociatedPersonCreate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssociatedPerson'
+
+  /customers/{customer_id}/associated_persons/{associated_person_id}:
+    get:
+      summary: Get a single associated person
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/AssociatedPersonId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssociatedPerson'
+    put:
+      summary: Update a single associated person
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/AssociatedPersonId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssociatedPersonUpdate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssociatedPerson'
+    delete:
+      summary: Delete a single associated person
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/AssociatedPersonId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                  id:
+                    type: string
+                    format: uuid
+
+  /customers/{customer_id}/tos_acceptance_link:
+    get:
+      summary: Get URL for ToS acceptance for a customer
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkResponse'
+
+  /customers/{customer_id}/kyc_link:
+    get:
+      summary: Get a KYC link for a customer
+      description: 返回用于触发个人/企业 KYC 的托管链接
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkResponse'
+
+  /customers/{customer_id}/transfers:
+    get:
+      summary: Get all transfers for a customer
+      description: 按条件筛选并返回客户的所有转账记录
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+        - name: tx_hash
+          in: query
+          schema: { type: string }
+        - name: updated_after_ms
+          in: query
+          schema: { type: integer, format: int64 }
+        - name: updated_before_ms
+          in: query
+          schema: { type: integer, format: int64 }
+        - name: state
+          in: query
+          description: 交易状态过滤
+          schema:
+            $ref: '#/components/schemas/TransferState'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transfer'
+
+  /customers/{customer_id}/static_templates:
+    get:
+      summary: Get all templates for a customer
+      description: 获取该客户下的转账模板集合
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransferTemplate'
+
+  /customers/tos_links:
+    post:
+      summary: Request a hosted URL for ToS acceptance (new customer)
+      description: 用于新客户创建流程，获取托管的 ToS 签约链接
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkResponse'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  parameters:
+    CustomerId:
+      name: customer_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    AssociatedPersonId:
+      name: associated_person_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+      description: 返回项目数（默认 10，最多 100）
+    StartingAfter:
+      name: starting_after
+      in: query
+      schema: { type: string }
+      description: 返回该 ID 之后的结果
+    EndingBefore:
+      name: ending_before
+      in: query
+      schema: { type: string }
+      description: 返回该 ID 之前的结果
+
+  schemas:
+    # ---------- Common Enums ----------
+    CustomerStatus:
+      type: string
+      description: 客户状态
+      enum: [active, awaiting_questions, awaiting_ubo, incomplete, not_started, offboarded, paused, rejected, under_review]
+
+    CapabilityState:
+      type: string
+      enum: [pending, active, inactive, rejected]
+
+    AccountPurposeIndividual:
+      type: string
+      enum: [charitable_donations, ecommerce_retail_payments, investment_purposes, operating_a_company, other, payments_to_friends_or_family_abroad, personal_or_living_expenses, protect_wealth, purchase_goods_and_services, receive_payment_for_freelancing, receive_salary]
+
+    EmploymentStatus:
+      type: string
+      enum: [employed, homemaker, retired, self_employed, student, unemployed]
+
+    SourceOfFundIndividual:
+      type: string
+      enum: [company_funds, ecommerce_reseller, gambling_proceeds, gifts, government_benefits, inheritance, investments_loans, pension_retirement, salary, sale_of_assets_real_estate, savings, someone_elses_funds]
+
+    BusinessType:
+      type: string
+      enum: [cooperative, corporation, llc, other, partnership, sole_prop, trust]
+
+    AccountPurposeBusiness:
+      type: string
+      enum: [charitable_donations, ecommerce_retail_payments, investment_purposes, other, payments_to_friends_or_family_abroad, payroll, personal_or_living_expenses, protect_wealth, purchase_goods_and_services, receive_payments_for_goods_and_services, tax_optimization, third_party_money_transmission, treasury_management]
+
+    SourceOfFundsBusiness:
+      type: string
+      enum: [business_loans, grants, inter_company_funds, investment_proceeds, legal_settlement, owners_capital, pension_retirement, sale_of_assets, sales_of_goods_and_services, tax_refund, third_party_funds, treasury_reserves]
+
+    EndorsementName:
+      type: string
+      description: 背书项目
+      enum: [card, QR, wallet]
+
+    EndorsementStatus:
+      type: string
+      enum: [incomplete, approved, revoked]
+
+    EndorsementAdditionalRequirement:
+      type: string
+      enum: [kyc_approval, tos_acceptance, kyc_with_proof_of_address, tos_v2_acceptance]
+
+    TransferState:
+      type: string
+      enum: [awaiting_funds, funds_received, payment_submitted, payment_processed, in_review, kyc_required, kyc_in_review, developer_kyb_required, canceled, error, returned, refunded, undeliverable]
+
+    PaymentRail:
+      type: string
+      description: 支付轨道/链或支付通道
+      enum: [arbitrum, avalanche_c_chain, base, ethereum, optimism, polygon, solana, spei, stellar, Alipay, WeChat, Creditcard]
+
+    CurrencyCode:
+      type: string
+      description: 计价币种（法币或加密）
+      enum: [usd, usdc, usdt]
+
+    SwiftCharge:
+      type: string
+      description: SWIFT 手续费承担方式
+      enum: [our, sha, ben]
+
+    # ---------- Common Objects ----------
+    Address:
+      type: object
+      properties:
+        street_line_1: { type: string }
+        street_line_2: { type: string }
+        city: { type: string }
+        province: { type: string }
+        country: { type: string }
+        postal_code: { type: string }
+
+    Capabilities:
+      type: object
+      properties:
+        payin_crypto: { $ref: '#/components/schemas/CapabilityState' }
+        payout_crypto: { $ref: '#/components/schemas/CapabilityState' }
+        payin_fiat: { $ref: '#/components/schemas/CapabilityState' }
+        payout_fiat: { $ref: '#/components/schemas/CapabilityState' }
+
+    RejectReason:
+      type: object
+      properties:
+        developer_reason: { type: string, description: 内部原因，不对外展示 }
+        reason: { type: string, description: 对外展示原因 }
+        created_at: { type: string, format: date-time }
+
+    Endorsement:
+      type: object
+      properties:
+        name: { $ref: '#/components/schemas/EndorsementName' }
+        status: { $ref: '#/components/schemas/EndorsementStatus' }
+        additional_requirements:
+          type: array
+          items: { $ref: '#/components/schemas/EndorsementAdditionalRequirement' }
+        requirements:
+          type: object
+          properties:
+            complete:
+              type: array
+              items: { type: string }
+            pending:
+              type: array
+              items: { type: string }
+            missing:
+              type: array
+              items: { type: string }
+            issues:
+              type: array
+              items: { type: string }
+
+    IDInformation:
+      type: object
+      properties:
+        type:
+          type: string
+          description: 证件类型（id, driver_license, military_id 等）
+        issuing_country:
+          type: string
+        number:
+          type: string
+        description:
+          type: string
+        expiry:
+          type: string
+        image_front:
+          type: string
+          description: 存放位置信息
+        image_back:
+          type: string
+          description: 存放位置信息
+
+    ProofDocument:
+      type: object
+      properties:
+        purpose:
+          type: string
+          description: 证明目的（proof_of_* 或 other）
+        file:
+          type: string
+        description:
+          type: string
+
+    LinkResponse:
+      type: object
+      properties:
+        url:
+          type: string
+
+    # ---------- Customer ----------
+    Customer:
+      type: object
+      required: [id, first_name, last_name, email, status, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid, description: 系统唯一 ID }
+        first_name: { type: string }
+        last_name: { type: string }
+        email: { type: string }
+        status: { $ref: '#/components/schemas/CustomerStatus' }
+        capabilities: { $ref: '#/components/schemas/Capabilities' }
+        future_requirements_due:
+          type: array
+          items: { type: string }
+          description: 未来需要补充的材料（如 id_verification）
+        requirements_due:
+          type: array
+          items: { type: string }
+          description: 当前缺失的材料（如 external_account 或 id_verification）
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        reject_reason:
+          type: array
+          items: { $ref: '#/components/schemas/RejectReason' }
+        has_accepted_term_of_service: { type: boolean }
+        endorsements:
+          type: array
+          items: { $ref: '#/components/schemas/Endorsement' }
+
+    CustomerCreateIndividual:
+      type: object
+      required: [type, first_name, last_name, email]
+      properties:
+        type:
+          type: string
+        first_name: { type: string }
+        middle_name: { type: string }
+        last_name: { type: string }
+        translated_first_name: { type: string }
+        translated_middle_name: { type: string }
+        translated_last_name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        address: { $ref: '#/components/schemas/Address' }
+        translated_address: { $ref: '#/components/schemas/Address' }
+        birth_day: { type: string }
+        sign_agreement_id: { type: string }
+        endorsement:
+          type: string
+          description: 背书项目（card, QR, wallet）
+        account_purpose: { $ref: '#/components/schemas/AccountPurposeIndividual' }
+        account_purpose_other: { type: string }
+        employment_status: { $ref: '#/components/schemas/EmploymentStatus' }
+        expected_monthly_payment_usd:
+          type: string
+          description: 预估月支付区间（如 0_4999, 5000_100000）
+        act_as_intermedia: { type: boolean, description: 是否为转钱中介 }
+        source_of_fund: { $ref: '#/components/schemas/SourceOfFundIndividual' }
+        nationality: { type: string }
+        verified_govid_at: { type: string, format: date-time }
+        verified_selfie_at: { type: string, format: date-time }
+        id_information:
+          type: array
+          items: { $ref: '#/components/schemas/IDInformation' }
+        document:
+          type: array
+          items: { $ref: '#/components/schemas/ProofDocument' }
+
+    CustomerCreateBusiness:
+      type: object
+      required: [type, business_legal_name, email, business_type]
+      properties:
+        type:
+          type: string
+        business_legal_name: { type: string }
+        business_trade_name: { type: string }
+        business_description: { type: string }
+        email: { type: string }
+        business_type: { $ref: '#/components/schemas/BusinessType' }
+        registered_address: { $ref: '#/components/schemas/Address' }
+        physical_address: { $ref: '#/components/schemas/Address' }
+        signed_agreement_id: { type: string }
+        is_dao: { type: boolean }
+        associated_persons:
+          type: array
+          items: { $ref: '#/components/schemas/AssociatedPersonCreate' }
+        business_industry:
+          type: array
+          items: { type: string }
+        has_material_intermediary_ownership: { type: boolean }
+        account_purpose: { $ref: '#/components/schemas/AccountPurposeBusiness' }
+        source_of_funds: { $ref: '#/components/schemas/SourceOfFundsBusiness' }
+        id_information:
+          type: array
+          items: { $ref: '#/components/schemas/IDInformation' }
+        documents:
+          type: array
+          items: { $ref: '#/components/schemas/ProofDocument' }
+        translated_business_name: { type: string }
+        translated_business_trade_name: { type: string }
+        primary_website: { type: string }
+        other_website:
+          type: array
+          items: { type: string }
+        translated_registered_address: { $ref: '#/components/schemas/Address' }
+        translated_physical_address: { $ref: '#/components/schemas/Address' }
+        compliance_screening_explanation: { type: string }
+        endorsements:
+          type: array
+          items:
+            type: string
+            description: 背书项目（creditcard, QR, wallet 等）
+        public_trade_listing:
+          type: array
+          items:
+            type: object
+            properties:
+              market_id: { type: string }
+              stock_number: { type: string, description: 国际证券标识码 }
+              ticker: { type: string }
+        ownership_threshold: { type: integer }
+        est_annual_revenue_usd: { type: string }
+        expected_monthly_payments_usd: { type: integer }
+        operate_in_prohibited_countries: { type: boolean }
+        account_purpose_other: { type: string }
+        high_risk_activities_explanation: { type: string }
+        high_risk_activities:
+          type: array
+          items:
+            type: string
+            enum:
+              - adult_entertainment
+              - gambling
+              - hold_client_funds
+              - investment_services
+              - lending_banking
+              - marijuana_or_related_services
+              - money_services
+              - nicotine_tobacco_or_related_services
+              - operate_foreign_exchange_virtual_currencies_brokerage_otc
+              - pharmaceuticals
+              - precious_metals_precious_stones_jewelry
+              - safe_deposit_box_rentals
+              - third_party_payment_processing
+              - weapons_firearms_and_explosives
+              - none_of_the_above
+        source_of_fund_description: { type: string }
+        conducts_money_services: { type: boolean }
+        using_money_service_evonet: { type: boolean }
+        using_money_service_description: { type: boolean }
+        regulated_activity:
+          type: object
+          properties:
+            regulated_act_description: { type: string }
+            primary_regulatory_country: { type: string }
+            primary_regulatory_authority_name: { type: string }
+            license_number: { type: string }
+
+    # ---------- Associated Person ----------
+    AssociatedPersonCreate:
+      type: object
+      required: [first_name, last_name, email]
+      properties:
+        first_name: { type: string }
+        last_name: { type: string }
+        email: { type: string }
+        birth_date: { type: string }
+        has_ownership: { type: boolean }
+        has_control: { type: boolean }
+        is_signer: { type: boolean }
+        relationship_established_at: { type: string, format: date-time }
+        middle_name: { type: string }
+        translated_first_name: { type: string }
+        translated_last_name: { type: string }
+        phone: { type: string }
+        is_director: { type: boolean }
+        title: { type: string }
+        ownership_percentage: { type: integer }
+        submitted_time: { type: string, format: date-time }
+        verified_govid_at: { type: string, format: date-time }
+        verified_selfie_at: { type: string, format: date-time }
+        completed_customer_check_at: { type: string, format: date-time }
+        documents:
+          type: array
+          items: { $ref: '#/components/schemas/ProofDocument' }
+
+    AssociatedPersonUpdate:
+      allOf:
+        - $ref: '#/components/schemas/AssociatedPersonCreate'
+
+    AssociatedPerson:
+      type: object
+      required: [id, first_name, last_name, email, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        email: { type: string }
+        first_name: { type: string }
+        last_name: { type: string }
+        has_ownership: { type: boolean }
+        has_control: { type: boolean }
+        is_signer: { type: boolean }
+        title: { type: string }
+        submitted_time: { type: string, format: date-time }
+        relationship_established_at: { type: string, format: date-time }
+
+    # ---------- Transfer ----------
+    Transfer:
+      type: object
+      required: [id, amount, currency, state, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid, description: 转账 UUID }
+        amount: { type: string, description: 法币计价（字符串以避免精度丢失） }
+        currency: { type: string }
+        on_behalf_of: { type: string, format: uuid, description: 平台代哪个客户转账 }
+        developer_fee: { type: string }
+        developer_fee_percentage: { type: integer }
+        source:
+          $ref: '#/components/schemas/TransferSource'
+        destination:
+          $ref: '#/components/schemas/TransferDestination'
+        state: { $ref: '#/components/schemas/TransferState' }
+        receipt:
+          $ref: '#/components/schemas/TransferReceipt'
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        client_reference_id: { type: string, description: 开发者侧自定义引用 ID }
+        source_deposit_instruction:
+          $ref: '#/components/schemas/SourceDepositInstruction'
+        return_detail:
+          $ref: '#/components/schemas/ReturnDetail'
+
+    TransferSource:
+      type: object
+      properties:
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+        payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+        payment_scheme:
+          type: string
+          description: 支付方案（如 creditcard, QR 等）
+        external_account_id: { type: string, format: uuid }
+        bank_beneficiary_name: { type: string }
+        bank_beneficiary_address: { type: string }
+        bank_routing_number: { type: string }
+        bank_name: { type: string }
+        originator_name: { type: string }
+        originator_address: { type: string }
+        wire_message: { type: string }
+        tracking_number: { type: string }
+        from_address: { type: string, description: 稳定币出金地址 }
+
+    TransferDestination:
+      type: object
+      properties:
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+        payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+        external_account_id: { type: string, format: uuid }
+        swift_charge: { $ref: '#/components/schemas/SwiftCharge' }
+        blockchain_memo: { type: string }
+        deposit_id: { type: string, format: uuid }
+        tracking_number: { type: string }
+        to_address: { type: string, description: 链上收款地址 }
+
+    TransferReceipt:
+      type: object
+      properties:
+        initial_amount: { type: string }
+        developer_fee: { type: string }
+        exchange_fee: { type: string, description: EVONET 收益金额 }
+        subtotal_amount: { type: string }
+        remaining_prefunded_balance: { type: string }
+        gas_fee: { type: string }
+        final_amount: { type: string }
+        source_tx_hash: { type: string }
+        destination_tx_hash: { type: string }
+        exchange_rate: { type: string }
+        url: { type: string }
+
+    SourceDepositInstruction:
+      type: object
+      properties:
+        payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+        amount: { type: string }
+        currency: { type: string }
+        from_address: { type: string, description: payin crypto address }
+        to_address: { type: string, description: payout to crypto address }
+        deposit_message: { type: string }
+        bank_name: { type: string }
+        bank_address: { type: string }
+        bank_routing_number: { type: string }
+        bank_account_number: { type: string }
+        beneficiary_name: { type: string }
+        beneficiary_address: { type: string }
+        iban: { type: string }
+        bic: { type: string }
+        account_holder_name: { type: string }
+        blockchain_memo: { type: string }
+
+    ReturnDetail:
+      type: object
+      properties:
+        reason: { type: string }
+        refund_reference_id: { type: string }
+
+    # ---------- Template ----------
+    TransferTemplate:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        payload:
+          type: object
+          additionalProperties: true

@@ -1,0 +1,168 @@
+openapi: 3.1.0
+info:
+  title: Developer Fee Configuration API
+  version: 1.0.0
+  description: 组织维度的清算地址费率与费用收款外部账户配置（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /developer/fees:
+    get:
+      summary: Get configured fee
+      description: >
+        获取当前组织下对所有客户生效的清算地址费率（BPS），在组织账户层面配置。
+        字段为字符串表示的小数，例如 "0.5"。
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeeConfig'
+    post:
+      summary: Update the configured fee
+      description: 更新组织层面的清算地址费率（BPS），字符串小数表示
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeeConfig'
+      responses:
+        default:
+          description: Response
+
+  /developer/fee_external_account:
+    get:
+      summary: Get the configured fee external account
+      description: 获取用于费用结算/分润的外部收款账户配置
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeeExternalAccount'
+    post:
+      summary: Configure a fee external account
+      description: 配置或更新用于费用结算/分润的外部收款账户
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeeExternalAccount'
+      responses:
+        default:
+          description: Response
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  schemas:
+    CurrencyFiat:
+      type: string
+      enum: [usd, eur]
+
+    AccountType:
+      type: string
+      enum: [bank, iban]
+
+    FeeConfig:
+      type: object
+      required: [default_liquidation_address_fee_percent]
+      properties:
+        default_liquidation_address_fee_percent:
+          type: string
+          description: 组织层面清算地址费率（BPS），字符串小数表示，如 "0.5"
+
+    Address:
+      type: object
+      properties:
+        street_line_1:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        post_code:
+          type: string
+
+    BankAccount:
+      type: object
+      properties:
+        routing_number:
+          type: string
+        account_number:
+          type: string
+        iban:
+          type: string
+        bic:
+          type: string
+        swift:
+          type: string
+
+    FeeExternalAccount:
+      type: object
+      required:
+        - id
+        - customer_id
+        - currency
+        - account_owner_name
+        - account_type
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 外部账户 UUID
+        customer_id:
+          type: string
+          format: uuid
+          description: 外部账户所属的客户/组织
+        currency:
+          $ref: '#/components/schemas/CurrencyFiat'
+        account_owner_name:
+          type: string
+        account_type:
+          $ref: '#/components/schemas/AccountType'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        bank_name:
+          type: string
+        account:
+          $ref: '#/components/schemas/BankAccount'
+        swift:
+          type: string
+          description: 兼容字段（如未放入 account.swift 时）
+        bank_account:
+          type: string
+          description: 兼容字段（如仅提供原始账号标识）
+        account_owner_type:
+          type: string
+          description: 账户所有者类型（individual 或 business 等）
+        first_name:
+          type: string
+        last_name:
+          type: string
+        business_name:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'

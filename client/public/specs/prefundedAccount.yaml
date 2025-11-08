@@ -1,0 +1,168 @@
+openapi: 3.0.4
+info:
+  title: Prefunded Accounts API
+  version: 1.0.0
+  description: 预充值账户查询与历史记录（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /prefunded_accounts:
+    get:
+      summary: Get a list of all prefunded accounts
+      description: 返回平台下所有预充值账户信息
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrefundedAccount'
+
+  /prefunded_accounts/{prefunded_account_id}:
+    get:
+      summary: Get details for a specific prefunded account
+      parameters:
+        - $ref: '#/components/parameters/PrefundedAccountId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrefundedAccount'
+
+  /prefunded_accounts/{prefunded_account_id}/history:
+    get:
+      summary: Get funding history of a prefunded account
+      parameters:
+        - $ref: '#/components/parameters/PrefundedAccountId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrefundedAccountHistory'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  parameters:
+    PrefundedAccountId:
+      name: prefunded_account_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Prefunded account UUID
+
+    Limit:
+      name: limit
+      in: query
+      description: 返回的条数限制（10–100）
+      schema:
+        type: integer
+        minimum: 10
+        maximum: 100
+        default: 10
+
+    StartingAfter:
+      name: starting_after
+      in: query
+      description: 返回在该时间点/ID 之后建立的记录
+      schema:
+        type: string
+
+    EndingBefore:
+      name: ending_before
+      in: query
+      description: 返回在该时间点/ID 之前建立的记录
+      schema:
+        type: string
+
+  schemas:
+    PrefundedAccount:
+      type: object
+      required:
+        - id
+        - available_balance
+        - currency
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Prefunded account ID
+        available_balance:
+          type: string
+          description: 账户可用余额
+        currency:
+          type: string
+          description: 余额币种
+        name:
+          type: string
+          description: 账户名称（用于识别对手交易）
+
+    PrefundedAccountHistory:
+      type: object
+      required:
+        - id
+        - amount
+        - available_balance
+        - currency
+        - name
+        - type
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 历史记录 ID
+        amount:
+          type: string
+          description: 交易金额
+        available_balance:
+          type: string
+          description: 交易后账户余额
+        currency:
+          type: string
+          description: 币种
+        name:
+          type: string
+          description: 账户名称
+        type:
+          type: string
+          enum: [funding, refunded_transfer]
+          description: 交易类型（funding / refunded transfer）
+        created_at:
+          type: string
+          format: date-time
+          description: 记录创建时间
+        withdrawal_id:
+          type: string
+          format: uuid
+          description: 取款 ID（与 deposit_id 互斥）
+        deposit_id:
+          type: string
+          format: uuid
+          description: 存款 ID（与 withdrawal_id 互斥）

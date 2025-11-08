@@ -1,0 +1,320 @@
+openapi: 3.0.4
+info:
+  title: Webhooks API
+  version: 1.0.0
+  description: Webhook 端点管理、事件预览、投递日志与回环测试（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /webhooks:
+    get:
+      summary: Get all webhook endpoints (active & inactive)
+      description: 返回当前组织下的全部 Webhook 端点（含 active/disabled/deleted）
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WebhookEndpoint'
+    post:
+      summary: Create a webhook endpoint
+      description: 创建新的 Webhook 端点
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookCreateRequest'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpoint'
+    put:
+      summary: Update a webhook
+      description: 更新已有 Webhook 端点；按请求体中的 id 指定目标端点
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookUpdateRequest'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEndpoint'
+
+  /webhooks/{webhook_id}:
+    delete:
+      summary: Delete a webhook
+      description: 删除指定的 Webhook 端点
+      parameters:
+        - $ref: '#/components/parameters/WebhookId'
+      responses:
+        default:
+          description: Response
+
+  /webhooks/{webhook_id}/events:
+    get:
+      summary: List upcoming events
+      description: 列出该 Webhook 即将接收的下一批事件（最多 10 条）
+      parameters:
+        - $ref: '#/components/parameters/WebhookId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WebhookEventPreview'
+
+  /webhooks/{webhook_id}/logs:
+    get:
+      summary: View logs
+      description: 查看该 Webhook 的最近投递日志
+      parameters:
+        - $ref: '#/components/parameters/WebhookId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WebhookDeliveryLog'
+
+  /webhooks/{webhook_id}/send:
+    post:
+      summary: Send event (echo test)
+      description: 触发一次回环测试，将指定 event_id 的事件回放至该 Webhook
+      parameters:
+        - $ref: '#/components/parameters/WebhookId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookEchoSendRequest'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookEchoSendResponse'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  parameters:
+    WebhookId:
+      name: webhook_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+      description: Webhook 端点 ID
+
+  schemas:
+    # ---------- Enums ----------
+    WebhookStatus:
+      type: string
+      enum: [active, disabled, deleted]
+
+    EventCategory:
+      type: string
+      enum:
+        [
+          customer,
+          kyc_link,
+          liquidation_address.drain,
+          static_memo.activity,
+          transfer,
+          virtual_account.activity,
+          card_account,
+          card_transaction,
+          card_withdrawal,
+          posted_card_account_transaction
+        ]
+
+    EventType:
+      type: string
+      description: 与 event_category 组合使用的事件后缀
+      enum: [created, updated, updated.status_transitioned, deleted, canceled]
+
+    EventObjectStatus:
+      type: string
+      enum:
+        [
+          not_started,
+          incomplete,
+          active,
+          rejected,
+          under_review,
+          manual_review,
+          awaiting_ubo,
+          approved,
+          awaiting_funds,
+          funds_received,
+          payment_submitted,
+          payment_processed,
+          in_review,
+          canceled,
+          error,
+          returned,
+          refunded,
+          undeliverable
+        ]
+
+    EventEpoch:
+      type: string
+      enum: [webhook_creation, beginning_of_time]
+
+    # ---------- Core types ----------
+    WebhookEndpoint:
+      type: object
+      required: [id, url, status, public_key, event_categories]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Webhook ID
+        url:
+          type: string
+          format: uri
+          description: Webhook 投递目标 URL
+        status:
+          $ref: '#/components/schemas/WebhookStatus'
+        public_key:
+          type: string
+          description: 用于验签的公钥，确保事件来源可信
+        event_categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventCategory'
+
+    WebhookCreateRequest:
+      type: object
+      required: [url, event_epoch, event_categories]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: 接收 Webhook 的 URL
+        event_epoch:
+          $ref: '#/components/schemas/EventEpoch'
+        event_categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventCategory'
+
+    WebhookUpdateRequest:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 待更新的 Webhook ID
+        url:
+          type: string
+          format: uri
+          description: 接收 Webhook 的 URL
+        status:
+          $ref: '#/components/schemas/WebhookStatus'
+        event_categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventCategory'
+
+    WebhookEventPreview:
+      type: object
+      properties:
+        api_version:
+          type: string
+        event_id:
+          type: string
+        event_developer_id:
+          type: string
+        event_category:
+          $ref: '#/components/schemas/EventCategory'
+        event_type:
+          $ref: '#/components/schemas/EventType'
+        event_object_id:
+          type: string
+        event_object:
+          type: object
+          description: 受影响的对象（结构随类别而变）
+          additionalProperties: true
+        event_object_changes:
+          type: object
+          description: 对象字段变更（差异）
+          additionalProperties: true
+        event_created_at:
+          type: string
+          format: date-time
+        event_sequence:
+          type: integer
+        event_object_status:
+          $ref: '#/components/schemas/EventObjectStatus'
+
+    WebhookDeliveryLog:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: 目标服务返回的 HTTP 状态码
+        event_id:
+          type: string
+        response_body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    WebhookEchoSendRequest:
+      type: object
+      required: [event_id]
+      properties:
+        event_id:
+          type: string
+          description: 要回放的事件 ID
+
+    WebhookEchoSendResponse:
+      type: object
+      properties:
+        message:
+          type: string

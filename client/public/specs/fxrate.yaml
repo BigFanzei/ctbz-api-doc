@@ -1,0 +1,67 @@
+openapi: 3.0.4
+info:
+  title: FX Rate API
+  version: 1.0.0
+  description: 外汇与加密货币汇率查询接口（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /exchange_rate:
+    get:
+      summary: Get FX rate
+      description: 查询两种货币之间的中间价、买入价与卖出价
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/CurrencyCode'
+          description: 源币种
+        - name: to
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/CurrencyCode'
+          description: 目标币种
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeRate'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  schemas:
+    CurrencyCode:
+      type: string
+      enum: [brl, btc, eth, eur, mxn, sol, usd]
+      description: 支持的货币代码
+
+    ExchangeRate:
+      type: object
+      required: [midmarket_rate, buy_rate, sell_rate]
+      properties:
+        midmarket_rate:
+          type: string
+          description: 中间价（mid-market rate）
+        buy_rate:
+          type: string
+          description: 买入价（buy rate）
+        sell_rate:
+          type: string
+          description: 卖出价（sell rate）

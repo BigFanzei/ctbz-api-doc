@@ -1,0 +1,101 @@
+openapi: 3.1.0
+info:
+  title: Batch Settlement Schedules API
+  version: 1.0.0
+  description: 批量清算计划创建接口（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /customers/{customer_id}/batch_settlement_schedules:
+    post:
+      summary: Create a batch settlement schedule
+      description: 为指定客户创建批量清算计划
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchSettlementScheduleCreate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchSettlementSchedule'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  parameters:
+    CustomerId:
+      name: customer_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+      description: 客户 UUID
+
+  schemas:
+    CurrencyCode:
+      type: string
+      enum: [usd, usdc, usdt]
+
+    PaymentRail:
+      type: string
+      description: 清算/出金通道
+      enum:
+        [arbitrum, avalanche_c_chain, base, ethereum, optimism, polygon, solana, spei, stellar, swift, ach, wire, bank_transfer, Creditcard, Alipay, WeChat]
+
+    DestinationRef:
+      type: object
+      properties:
+        currency:
+          $ref: '#/components/schemas/CurrencyCode'
+        payment_rails:
+          $ref: '#/components/schemas/PaymentRail'
+        external_account_id:
+          type: string
+          description: 外部银行账户 ID（对应 external_account 对象）
+        evonet_wallet_id:
+          type: string
+          format: uuid
+          description: 内部钱包 ID
+        trace_number:
+          type: string
+        tracking_number:
+          type: string
+        deposit_id:
+          type: string
+          description: 对应的入金事件 ID
+        blockchain_memo:
+          type: string
+
+    BatchSettlementScheduleCreate:
+      type: object
+      required: [destination]
+      properties:
+        destination:
+          $ref: '#/components/schemas/DestinationRef'
+
+    BatchSettlementSchedule:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 成功创建的清算计划 ID（可在平台展示）

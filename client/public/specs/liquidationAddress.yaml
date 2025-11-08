@@ -1,0 +1,441 @@
+openapi: 3.0.4
+info:
+  title: Liquidation Addresses API
+  version: 1.0.0
+  description: 清算地址与资金流（Drains）接口（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /customers/{customer_id}/liquidation_addresses:
+    get:
+      summary: Get all liquidation addresses for a customer
+      description: 返回指定客户名下的所有清算地址（支持分页）
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/LiquidationAddress' }
+    post:
+      summary: Create a liquidation address
+      description: 为客户创建新的清算地址
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiquidationAddressCreate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiquidationAddress'
+
+  /liquidation_addresses:
+    get:
+      summary: Get all liquidation addresses (all customers)
+      description: 平台维度列出全部清算地址（支持分页）
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/LiquidationAddress' }
+
+  /customers/{customer_id}/liquidation_addresses/{liquidation_address_id}:
+    get:
+      summary: Get a liquidation address
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/LiquidationAddressId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiquidationAddress'
+    put:
+      summary: Update a liquidation address
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/LiquidationAddressId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiquidationAddressUpdate'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiquidationAddress'
+
+  /customers/{customer_id}/liquidation_addresses/{liquidation_address_id}/drains:
+    get:
+      summary: Get drain history of a liquidation address
+      description: 追踪链上清算地址的资金流（Drains）与状态变更
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/LiquidationAddressId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+        - $ref: '#/components/parameters/UpdatedAfterMs'
+        - $ref: '#/components/parameters/UpdatedBeforeMs'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/LiquidationDrain' }
+
+  /liquidation_address/drains:
+    get:
+      summary: Liquidation address activity across all customers
+      description: 获取当前机构下所有客户清算地址的资金流水（Drains）
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+        - $ref: '#/components/parameters/UpdatedAfterMs'
+        - $ref: '#/components/parameters/UpdatedBeforeMs'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/LiquidationDrain' }
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  parameters:
+    CustomerId:
+      name: customer_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+      description: 客户 UUID
+    LiquidationAddressId:
+      name: liquidation_address_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+      description: 清算地址 UUID
+    Limit:
+      name: limit
+      in: query
+      description: 返回的条数限制（10–100）
+      schema:
+        type: integer
+        minimum: 10
+        maximum: 100
+        default: 10
+    StartingAfter:
+      name: starting_after
+      in: query
+      description: 返回在该时间点或 ID 之后建立的记录
+      schema: { type: string }
+    EndingBefore:
+      name: ending_before
+      in: query
+      description: 返回在该时间点或 ID 之前建立的记录
+      schema: { type: string }
+    UpdatedAfterMs:
+      name: updated_after_ms
+      in: query
+      description: 返回该毫秒时间戳（含）之后更新的记录
+      schema: { type: integer, format: int64 }
+    UpdatedBeforeMs:
+      name: updated_before_ms
+      in: query
+      description: 返回该毫秒时间戳（含）之前更新的记录
+      schema: { type: integer, format: int64 }
+
+  schemas:
+    # ------- Enums -------
+    CurrencyCode:
+      type: string
+      description: 币种
+      enum: [usd, usdc, usdt]
+    TokenCurrency:
+      type: string
+      description: 代币币种（清算地址支持）
+      enum: [usdc, usdt]
+    Chain:
+      type: string
+      description: 公链或链族
+      enum: [ethereum, optimism, polygon, evm]
+    PaymentRail:
+      type: string
+      description: 支付/清算通道
+      enum: [arbitrum, avalanche_c_chain, base, ethereum, optimism, polygon, solana, spei, stellar, Alipay, WeChat, Creditcard]
+    LiquidationState:
+      type: string
+      description: 清算地址状态
+      enum: [active, deactive]
+    DrainState:
+      type: string
+      description: 资金流转状态
+      enum: [awaiting_funds, in_review, funds_received, payment_submitted, payment_processed, canceled, error, undeliverable, returned, refunded]
+
+    # ------- Common objects -------
+    AddressOnChain:
+      type: object
+      properties:
+        address: { type: string, description: 链上地址 }
+        blockchain_memo: { type: string }
+
+    DestinationDetail:
+      type: object
+      properties:
+        payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+        currency:
+          type: string
+          description: 出金的目标币种（可为加密或法币）
+        to_address: { type: string, description: 出金链上地址（如为链上出金） }
+        external_account_id: { type: string, format: uuid, description: 出金银行/外部账户 ID（如为法币出金） }
+        trace_number: { type: string }
+        message: { type: string }
+
+    ReturnDetails:
+      type: object
+      properties:
+        reason: { type: string }
+
+    Receipt:
+      type: object
+      description: 金额均以清算地址的币种口径展示
+      properties:
+        initial_amount: { type: string, description: 原始交易金额 }
+        developer_fee: { type: string, description: 开发者分润金额 }
+        subtotal_amount: { type: string, description: initial_amount - developer_fee }
+        converted_amount: { type: string, description: 按目标币种折算的金额 }
+        exchange_rate: { type: string, description: 目标金额 / (initial_amount - developer_fee) }
+        outgoing_amount: { type: string, description: 最终出金额 = converted_amount - gas_fee }
+        destination_currency:
+          type: string
+          description: 发送给客户的目标币种
+        gas_fee: { type: string }
+        url: { type: string }
+
+    # ------- Liquidation Address -------
+    LiquidationAddress:
+      type: object
+      required:
+        - id
+        - currency
+        - chain
+        - customer_id
+        - address
+        - created_at
+        - updated_at
+        - state
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 清算地址在系统内部的代号
+        currency:
+          $ref: '#/components/schemas/TokenCurrency'
+        chain:
+          $ref: '#/components/schemas/Chain'
+        customer_id:
+          type: string
+          format: uuid
+          description: 该地址所属的客户 UUID
+        external_customer_id:
+          type: string
+          description: 目标外部银行账户 ID（需与目标币种一致，关联 external_account）
+        destination_payment_rail:
+          $ref: '#/components/schemas/PaymentRail'
+        destination_currency:
+          $ref: '#/components/schemas/CurrencyCode'
+        address:
+          type: string
+          description: 平台分配给用户的充值/清算地址
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        prefunded_account_id:
+          type: string
+          format: uuid
+          description: 开发者的预充值账户，用于接收代理/开发者分润
+        custom_developer_fee_percent:
+          type: string
+          description: 开发者自定义费率（bps）
+        global_developer_fee_percent:
+          type: string
+          description: 全局缺省费率（bps）
+        destination_transfer_message:
+          type: string
+          description: 出金转账附言
+        destination_reference:
+          type: string
+          description: 出金参考号/附言
+        destination_address:
+          type: string
+          description: 用户链上自有收款地址（如为链上出金）
+        destination_blockchain_memo:
+          type: string
+        return_address:
+          type: string
+          description: 退款地址（通常与入金地址一致；为未来用途预留）
+        evonet_wallet_id:
+          type: string
+          format: uuid
+        state:
+          $ref: '#/components/schemas/LiquidationState'
+
+    LiquidationAddressCreate:
+      type: object
+      required:
+        - currency
+        - chain
+        - destination_currency
+      properties:
+        currency:
+          $ref: '#/components/schemas/TokenCurrency'
+        chain:
+          $ref: '#/components/schemas/Chain'
+        external_customer_id:
+          type: string
+          description: 目标外部银行账户 ID（与 external_account 对应）
+        prefunded_account_id:
+          type: string
+          format: uuid
+          description: 预充值账户（用于分润）
+        evonet_wallet_id:
+          type: string
+          format: uuid
+        destination_payment_rail:
+          $ref: '#/components/schemas/PaymentRail'
+        destination_currency:
+          $ref: '#/components/schemas/CurrencyCode'
+        destination_address:
+          type: string
+          description: 用户自有链上地址（出金到链上时必填）
+        custom_developer_fee_percent:
+          type: string
+          description: 自定义费率（bps）
+        destination_blockchain_memo:
+          type: string
+        return_address:
+          type: string
+          description: 退款地址
+
+    LiquidationAddressUpdate:
+      type: object
+      properties:
+        external_customer_id:
+          type: string
+          description: 目标外部银行账户 ID（与 external_account 对应）
+        return_address:
+          type: string
+          description: 退款地址
+
+    # ------- Drains -------
+    LiquidationDrain:
+      type: object
+      required:
+        - id
+        - amount
+        - customer_id
+        - liquidation_address_id
+        - currency
+        - state
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        amount:
+          type: string
+        customer_id:
+          type: string
+          format: uuid
+        liquidation_address_id:
+          type: string
+          format: uuid
+        currency:
+          $ref: '#/components/schemas/TokenCurrency'
+        state:
+          $ref: '#/components/schemas/DrainState'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deposit_tx_hash:
+          type: string
+        from_address:
+          type: string
+          description: 资金来源链上地址（转入到 liquidation address）
+        source_payment_rail:
+          $ref: '#/components/schemas/PaymentRail'
+        destination:
+          $ref: '#/components/schemas/DestinationDetail'
+        destination_tx_hash:
+          type: string
+        refund_tx_hash:
+          type: string
+        return_details:
+          $ref: '#/components/schemas/ReturnDetails'
+        receipt:
+          $ref: '#/components/schemas/Receipt'

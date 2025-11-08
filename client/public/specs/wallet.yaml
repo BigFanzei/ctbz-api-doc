@@ -1,0 +1,299 @@
+openapi: 3.0.4
+info:
+  title: Wallet Service API
+  version: 1.0.0
+  description: |
+    钱包与交易查询接口（无示例 & 无状态码版）。
+    - 统一使用 ISO 8601 UTC 时间（format: date-time）
+    - 统一错误结构：code / message / details / trace_id
+    - 分页参数：limit / starting_after / ending_before
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - bearerAuth: []
+
+paths:
+  /wallets:
+    get:
+      summary: Get wallets
+      description: 分页返回钱包列表。
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count:
+                    type: integer
+                    description: 返回数据集的长度
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Wallet'
+
+  /wallets/total-balance:
+    get:
+      summary: Get total balance of all wallets
+      description: 返回当前账户名下所有钱包的汇总余额。
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalBalance'
+
+  /wallets/{wallet_id}/history:
+    get:
+      summary: Get transaction history of a wallet
+      description: 查询指定钱包的交易历史。
+      parameters:
+        - name: wallet_id
+          in: path
+          required: true
+          description: 钱包 UUID
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Limit'
+        - name: update_after_ms
+          in: query
+          description: 返回该毫秒时间戳（含）之后更新的交易（Unix ms）
+          schema: { type: integer, format: int64 }
+        - name: update_before_ms
+          in: query
+          description: 返回该毫秒时间戳（含）之前更新的交易（Unix ms）
+          schema: { type: integer, format: int64 }
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count: { type: integer, description: 返回数据集大小 }
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+
+  /customers/{customer_id}/wallets:
+    get:
+      summary: Get all wallets for a customer
+      description: 返回某客户的全部钱包列表（分页）。
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [count, data]
+                properties:
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Wallet'
+
+    post:
+      summary: Create a wallet
+      description: 为指定客户新建钱包（幂等）。
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: 幂等键，避免重复创建
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chain]
+              properties:
+                chain: { $ref: '#/components/schemas/Chain' }
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+
+  /customers/{customer_id}/wallets/{wallet_id}:
+    get:
+      summary: Get a wallet
+      description: 查询某客户的单个钱包及其余额列表。
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: wallet_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Wallet'
+                  - type: object
+                    properties:
+                      balances:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BalanceItem'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      description: 返回的项目数（默认为 10，最多 100）
+      schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+    StartingAfter:
+      name: starting_after
+      in: query
+      description: 返回该钱包 ID 之后的钱包列表
+      schema: { type: string }
+    EndingBefore:
+      name: ending_before
+      in: query
+      description: 返回该钱包 ID 之前的钱包列表
+      schema: { type: string }
+
+  schemas:
+    Chain:
+      type: string
+      enum: [base, solana]
+      description: 钱包所在链
+
+    Currency:
+      type: string
+      enum: [usdt, usdc, usd]
+      description: 支持币种
+
+    PaymentRail:
+      type: string
+      enum:
+        - arbitrum
+        - avalanche_c_chain
+        - base
+        - ethereum
+        - optimism
+        - polygon
+        - solana
+        - spei
+        - stellar
+        - Alipay
+        - WeChat
+        - Creditcard
+      description: 支付/链路类型
+
+    Wallet:
+      type: object
+      required: [chain, id, address, created_at, updated_at]
+      properties:
+        chain: { $ref: '#/components/schemas/Chain' }
+        id: { type: string, format: uuid, description: 全局唯一 ID (UUID) }
+        address: { type: string, description: 链上地址 }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+      description: 钱包实体定义。
+
+    BalanceItem:
+      type: object
+      required: [balance, currency, chain]
+      properties:
+        balance: { type: string, description: 指定币种余额（字符串避免精度丢失） }
+        currency: { $ref: '#/components/schemas/Currency' }
+        chain: { $ref: '#/components/schemas/Chain' }
+        contract_address:
+          type: string
+          nullable: true
+          description: 合约地址；原生代币为空
+
+    TotalBalance:
+      type: object
+      required: [balance, currency, chain]
+      properties:
+        balance: { type: string }
+        currency: { $ref: '#/components/schemas/Currency' }
+        chain: { $ref: '#/components/schemas/Chain' }
+        contract_address:
+          type: string
+          nullable: true
+
+    TransactionEndpointSource:
+      type: object
+      properties:
+        payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+        payment_currency: { $ref: '#/components/schemas/Currency' }
+
+    TransactionEndpointDestination:
+      type: object
+      properties:
+        payment_rail: { $ref: '#/components/schemas/PaymentRail' }
+        payment_currency: { $ref: '#/components/schemas/Currency' }
+
+    Transaction:
+      type: object
+      required: [amount, created_at, updated_at]
+      properties:
+        amount: { type: string, description: 交易金额，单位 USD (字符串) }
+        developer_fee: { type: string, description: 开发者/客户预留手续费，美元计价 }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        customer_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: 关联客户 ID（如有）
+        source: { $ref: '#/components/schemas/TransactionEndpointSource' }
+        destination: { $ref: '#/components/schemas/TransactionEndpointDestination' }
+
+    Error:
+      type: object
+      required: [code, message, trace_id]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        details: { type: object, additionalProperties: true }
+        trace_id: { type: string }

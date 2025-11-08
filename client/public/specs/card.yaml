@@ -1,0 +1,847 @@
+openapi: 3.1.0
+info:
+  title: Card Accounts API
+  version: 1.0.0
+  description: 卡账户、PIN、移动钱包、交易、授权控制与对账单接口（无示例、无状态码版）
+
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://sandbox.api.example.com
+    description: Sandbox
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /customers/{customer_id}/card_accounts/{card_account_id}/pin:
+    post:
+      summary: Create card PIN change URL
+      description: 生成一次性 PIN 修改 URL，可嵌入 iframe，单次有效
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/ephemeral_keys:
+    post:
+      summary: Generate key to reveal card details
+      description: 生成临时传输密钥保护卡面信息传输（5 分钟轮换）
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [client_nonce]
+              properties:
+                client_nonce:
+                  type: string
+                  description: 客户端随机数，需与客户后端私钥配合使用
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: 传输密钥（5 分钟轮换）
+
+  /developer/cards/summary:
+    get:
+      summary: Get summary of card program
+      description: 获取机构下卡计划汇总指标
+      parameters:
+        - name: period
+          in: query
+          schema:
+            $ref: '#/components/schemas/SummaryPeriod'
+        - name: period_key
+          in: query
+          schema:
+            type: string
+          description: 年=YYYY；月=YYYYMM；周=YYYYMMWW
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeveloperCardsSummary'
+
+  /customers/{customer_id}/card_accounts/{card_account_id}:
+    get:
+      summary: Get a card account
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardAccount'
+
+  /customers/{customer_id}/card_accounts:
+    get:
+      summary: Get all card accounts
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CardAccount'
+    post:
+      summary: Provision a card account
+      description: 虚拟卡开卡（每个客户 1 张虚拟卡）
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardProvisionRequest'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardAccount'
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/freeze:
+    post:
+      summary: Freeze a card account
+      description: 冻结卡账户
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardFreezeRequest'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardFreezeRecord'
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/unfreeze:
+    post:
+      summary: Unfreeze a card account
+      description: 解除卡账户冻结
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [initiator]
+              properties:
+                initiator:
+                  $ref: '#/components/schemas/FreezeInitiator'
+      responses:
+        default:
+          description: Response
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/create_mobile_wallet_provisioning_request:
+    post:
+      summary: Create a mobile wallet push provisioning request
+      description: 将卡推送至 Apple Pay 或 Google Pay
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MobileWalletProvisionRequest'
+      responses:
+        default:
+          description: Response
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/authorizations:
+    get:
+      summary: Get pending card authorizations
+      description: 查询进行中的授权交易
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 100, maximum: 200, default: 100 }
+        - name: starting_time
+          in: query
+          schema: { type: string, format: date-time }
+        - name: ending_time
+          in: query
+          schema: { type: string, format: date-time }
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CardAuthorization'
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/transactions:
+    get:
+      summary: Get card transactions
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 100, maximum: 200, default: 100 }
+        - name: starting_time
+          in: query
+          schema: { type: string, format: date-time }
+        - name: ending_time
+          in: query
+          schema: { type: string, format: date-time }
+        - name: page_size
+          in: query
+          schema: { type: integer, minimum: 100, maximum: 200, default: 100 }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1 }
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, posted]
+        - name: pagination_token
+          in: query
+          schema: { type: string }
+        - name: category_family
+          in: query
+          schema:
+            $ref: '#/components/schemas/CategoryFamily'
+          description: 顶层类别过滤
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardTransactionList'
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/transactions/{transaction_id}:
+    get:
+      summary: Get a card transaction
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+        - $ref: '#/components/parameters/TransactionId'
+      responses:
+        default:
+          description: Response
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/auth_controls:
+    get:
+      summary: Get authorization controls
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthControls'
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/deposit_addresses:
+    post:
+      summary: Provision an additional top-up deposit address for the card account
+      description: 申请额外的链上充值通道；返回的地址显示在 additional_funding_instruction
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chain]
+              properties:
+                chain:
+                  $ref: '#/components/schemas/Chain'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositAddress'
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/withdrawals:
+    get:
+      summary: Get withdrawal history of funds
+      description: 查询提现历史
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/StartingAfter'
+        - $ref: '#/components/parameters/EndingBefore'
+      responses:
+        default:
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CardWithdrawal'
+    post:
+      summary: Create fund withdrawal request
+      description: 创建提现请求
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCardWithdrawalRequest'
+      responses:
+        default:
+          description: Response
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/withdrawals/{card_withdrawal_id}:
+    get:
+      summary: Get a card withdrawal
+      description: 获取单笔提现记录
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+        - $ref: '#/components/parameters/CardWithdrawalId'
+      responses:
+        default:
+          description: Response
+
+  /customers/{customer_id}/card_accounts/{card_account_id}/statements/{period}.pdf:
+    post:
+      summary: Generate a card account statement (PDF)
+      parameters:
+        - $ref: '#/components/parameters/CustomerId'
+        - $ref: '#/components/parameters/CardAccountId'
+        - $ref: '#/components/parameters/StatementPeriod'
+      responses:
+        default:
+          description: PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+  parameters:
+    CustomerId:
+      name: customer_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    CardAccountId:
+      name: card_account_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    TransactionId:
+      name: transaction_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    CardWithdrawalId:
+      name: card_withdrawal_id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+      description: 返回条数限制
+    StartingAfter:
+      name: starting_after
+      in: query
+      schema: { type: string }
+      description: 返回在该 ID 之后的记录
+    EndingBefore:
+      name: ending_before
+      in: query
+      schema: { type: string }
+      description: 返回在该 ID 之前的记录
+    StatementPeriod:
+      name: period
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^[0-9]{6}$'
+      description: 对账期（YYYYMM）
+
+  schemas:
+    # -------- Enums / Common --------
+    CardStatus:
+      type: string
+      enum: [active, pending, inactive, frozen]
+    FreezeInitiator:
+      type: string
+      enum: [developer, customer]
+    FreezeReason:
+      type: string
+      enum: [lost_or_stolen, suspicious_activity, planned_inactivity, suspected_fraud, other]
+    Chain:
+      type: string
+      enum: [eth, sol]
+    CurrencyCode:
+      type: string
+      description: 货币代码（可含法币/加密）
+    SummaryPeriod:
+      type: string
+      enum: [year, month, week, day, lifetime]
+    CategoryFamily:
+      type: string
+      enum: [cards, crypto, QR]
+
+    # -------- Developer Summary --------
+    DeveloperCardsSummary:
+      type: object
+      properties:
+        period:
+          $ref: '#/components/schemas/SummaryPeriod'
+        period_starting:
+          type: string
+          description: 期间起始（ISO 日期或 YYYY/WW 口径）
+        card_provisioned_count:
+          type: integer
+          description: 期间内开卡数量
+        card_transactions_count:
+          type: integer
+        provisioned_card_by_country:
+          type: object
+          additionalProperties:
+            type: integer
+          description: 各国家/地区开卡数量分布
+        transaction_volume:
+          type: string
+        transacting_card_acconts_count:
+          type: string
+        card_transactions_count_by_country:
+          type: object
+          additionalProperties:
+            type: integer
+        transaction_volume_by_country:
+          type: object
+          additionalProperties:
+            type: string
+        transacting_cards_by_country:
+          type: object
+          additionalProperties:
+            type: integer
+
+    # -------- Card Account Aggregate Types --------
+    Money:
+      type: object
+      properties:
+        amount: { type: string }
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+
+    BalanceBreakdown:
+      type: object
+      properties:
+        available: { $ref: '#/components/schemas/Money' }
+        hold: { $ref: '#/components/schemas/Money' }
+
+    CardholderName:
+      type: object
+      properties:
+        first_name: { type: string }
+        middle_name: { type: string }
+        last_name: { type: string }
+
+    CardDetails:
+      type: object
+      properties:
+        last_4: { type: string }
+        expiry: { type: string }
+        bin: { type: string }
+
+    CryptoAccount:
+      type: object
+      properties:
+        type:
+          type: string
+          description: 标准自托管或 evonet-wallet
+          enum: [standard, evonet-wallet]
+        address: { type: string }
+
+    FundingInstruction:
+      type: object
+      properties:
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+        chain: { $ref: '#/components/schemas/Chain' }
+        address:
+          type: string
+          description: EVONET 提供的充值地址
+        memo:
+          type: string
+          description: 如链要求 Memo/Tag，充值时必须携带
+
+    FreezeWindow:
+      type: object
+      properties:
+        initiator: { $ref: '#/components/schemas/FreezeInitiator' }
+        card_account_id: { type: string, format: uuid }
+        reason:
+          $ref: '#/components/schemas/FreezeReason'
+        reason_detail: { type: string }
+        created_at: { type: string, format: date-time }
+        starting_at: { type: string, format: date-time }
+        ending_at: { type: string, format: date-time }
+
+    # -------- Core: CardAccount --------
+    CardAccount:
+      type: object
+      required: [id, customer_id, status]
+      properties:
+        id:
+          type: string
+          description: card account UUID
+        customer_id:
+          type: string
+        card_image_url:
+          type: string
+          format: uri
+        status:
+          $ref: '#/components/schemas/CardStatus'
+        status_reason:
+          type: string
+        balance:
+          $ref: '#/components/schemas/BalanceBreakdown'
+        freezes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FreezeWindow'
+        client_reference_id:
+          type: string
+        cardholder_name:
+          $ref: '#/components/schemas/CardholderName'
+        card_details:
+          $ref: '#/components/schemas/CardDetails'
+        crypto_account:
+          $ref: '#/components/schemas/CryptoAccount'
+        funding_instruction:
+          $ref: '#/components/schemas/FundingInstruction'
+        additional_funding_instruction:
+          type: array
+          items:
+            $ref: '#/components/schemas/FundingInstruction'
+
+    # -------- Provision / Freeze / Unfreeze --------
+    CardProvisionRequest:
+      type: object
+      required: [currency, chain]
+      properties:
+        currency:
+          $ref: '#/components/schemas/CurrencyCode'
+          description: 虚拟卡支持的加密货币
+        chain:
+          $ref: '#/components/schemas/Chain'
+        client_reference_id:
+          type: string
+        crypto_account:
+          $ref: '#/components/schemas/CryptoAccount'
+
+    CardFreezeRequest:
+      type: object
+      required: [initiator, reason]
+      properties:
+        initiator:
+          $ref: '#/components/schemas/FreezeInitiator'
+        reason:
+          $ref: '#/components/schemas/FreezeReason'
+        reason_detail:
+          type: string
+        starting_at:
+          type: string
+          format: date-time
+        ending_at:
+          type: string
+          format: date-time
+
+    CardFreezeRecord:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/CardStatus'
+        card_account_id:
+          type: string
+        initiator:
+          $ref: '#/components/schemas/FreezeInitiator'
+        reason:
+          $ref: '#/components/schemas/FreezeReason'
+        reason_detail:
+          type: string
+        starting_at:
+          type: string
+          format: date-time
+        ending_at:
+          type: string
+          format: date-time
+
+    # -------- Mobile Wallet --------
+    WalletProvider:
+      type: string
+      enum: [apple_pay, google_pay]
+
+    MobileWalletProvisionRequest:
+      type: object
+      required: [wallet_provider]
+      properties:
+        wallet_provider:
+          $ref: '#/components/schemas/WalletProvider'
+        apple_pay:
+          type: object
+          properties:
+            leaf_cert: { type: string }
+            subordinate_cert: { type: string }
+            nonce: { type: string }
+            nonce_signature: { type: string }
+            encoding:
+              type: string
+        google_pay:
+          type: object
+          properties:
+            client_wallet_account_id: { type: string }
+            client_device_id: { type: string }
+            scheme:
+              type: string
+
+    # -------- Authorizations / Transactions --------
+    VerificationData:
+      type: object
+      properties:
+        avs: { type: string }
+        cvv: { type: string }
+        _3ds: { type: string }
+
+    LocalTransactionDetail:
+      type: object
+      properties:
+        amount: { type: string }
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+        exchange_rate: { type: string }
+
+    CardAuthorization:
+      type: object
+      properties:
+        id: { type: string }
+        amount: { type: string }
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+        mcc: { type: string }
+        description: { type: string }
+        authorized_at: { type: string }
+        billing_amount: { type: string }
+        details:
+          type: object
+          properties:
+            vendor_auth_id:
+              type: string
+              description: 外部系统订单号（用于对账）
+        local_transaction_details:
+          $ref: '#/components/schemas/LocalTransactionDetail'
+        verification_data:
+          $ref: '#/components/schemas/VerificationData'
+
+    TransactionCategory:
+      type: string
+      enum:
+        [adjustment, fee, purchase, refund, crypto_funding, crypto_return, crypto_withdrawal]
+
+    CardTransaction:
+      type: object
+      properties:
+        id: { type: string }
+        category:
+          $ref: '#/components/schemas/TransactionCategory'
+        amount: { type: string }
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+        description: { type: string }
+        posted_at: { type: string, format: date-time }
+        card_account_id: { type: string }
+        customer_id: { type: string }
+        billing_amount: { type: string }
+        mcc: { type: string }
+        merchant_name: { type: string }
+        merchant_location: { type: string }
+        local_transaction_detail:
+          $ref: '#/components/schemas/LocalTransactionDetail'
+        authorized_at: { type: string, format: date-time }
+
+    CardTransactionList:
+      type: object
+      properties:
+        page: { type: integer }
+        count: { type: integer }
+        total_page: { type: integer }
+        total_count: { type: integer }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardTransaction'
+        pagination_token:
+          type: string
+
+    # -------- Auth Controls --------
+    SpendingLimit:
+      type: object
+      properties:
+        period:
+          type: string
+          enum: [daily, trial_lifetime]
+        total_amount:
+          type: string
+          description: spending_limit.total_amount
+        remaining_amount:
+          type: string
+        timezone:
+          type: string
+        next_reset_at:
+          type: string
+          format: date-time
+        currency:
+          $ref: '#/components/schemas/CurrencyCode'
+
+    AuthControls:
+      type: object
+      properties:
+        customer_id: { type: string }
+        card_account_id: { type: string }
+        spending_limit:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpendingLimit'
+
+    # -------- Deposit Address --------
+    DepositAddress:
+      type: object
+      properties:
+        currency:
+          $ref: '#/components/schemas/CurrencyCode'
+        chain:
+          $ref: '#/components/schemas/Chain'
+        address:
+          type: string
+          description: 新分配的充值地址
+        memo:
+          type: string
+          description: 若返回，链上充值必须携带
+
+    # -------- Withdrawals --------
+    GasFee:
+      type: object
+      properties:
+        amount: { type: string }
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+
+    WithdrawalDestination:
+      type: object
+      properties:
+        chain: { $ref: '#/components/schemas/Chain' }
+        address: { type: string }
+        memo: { type: string }
+        tx_hash: { type: string }
+        gas_fee: { $ref: '#/components/schemas/GasFee' }
+
+    CardWithdrawalType:
+      type: string
+      enum: [top_up_balance_withdrawal, fee]
+
+    CardWithdrawal:
+      type: object
+      properties:
+        id: { type: string }
+        amount: { type: string }
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+        destination:
+          $ref: '#/components/schemas/WithdrawalDestination'
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        type:
+          $ref: '#/components/schemas/CardWithdrawalType'
+        client_note: { type: string }
+
+    CreateCardWithdrawalRequest:
+      type: object
+      required: [id, amount, currency, destination, type]
+      properties:
+        id: { type: string }
+        amount: { type: string }
+        currency: { $ref: '#/components/schemas/CurrencyCode' }
+        destination:
+          type: object
+          properties:
+            chain: { $ref: '#/components/schemas/Chain' }
+            address: { type: string }
+            memo: { type: string }
+            gas_fee: { type: string }
+        type:
+          $ref: '#/components/schemas/CardWithdrawalType'
+        client_note: { type: string }
