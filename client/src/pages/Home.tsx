@@ -1,7 +1,126 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Book, Code, FileText, Zap, Shield, Globe } from "lucide-react";
+import { Book, Code, FileText, Zap, Shield, Globe, ArrowRight, CreditCard, Users, Repeat, Wallet, Building, Coins, Link as LinkIcon, Settings, Webhook, TrendingUp, Clock } from "lucide-react";
 import { Link } from "wouter";
+
+// API模块配置
+const API_MODULES = [
+  {
+    name: "Customer & Transfer",
+    file: "customer",
+    icon: Users,
+    color: "blue",
+    description: "Customer management and transfer operations"
+  },
+  {
+    name: "Transfers",
+    file: "transfer",
+    icon: Repeat,
+    color: "green",
+    description: "Money transfer and transaction processing"
+  },
+  {
+    name: "Wallet Service",
+    file: "wallet",
+    icon: Wallet,
+    color: "purple",
+    description: "Digital wallet creation and management"
+  },
+  {
+    name: "Card Accounts",
+    file: "card",
+    icon: CreditCard,
+    color: "pink",
+    description: "Card issuance and account management"
+  },
+  {
+    name: "External Accounts",
+    file: "externalAccount",
+    icon: Building,
+    color: "orange",
+    description: "Link and manage external bank accounts"
+  },
+  {
+    name: "Virtual Accounts",
+    file: "virtualAccount",
+    icon: Coins,
+    color: "cyan",
+    description: "Virtual account creation and operations"
+  },
+  {
+    name: "Batch Settlement",
+    file: "batchSettlement",
+    icon: Clock,
+    color: "indigo",
+    description: "Scheduled batch payment processing"
+  },
+  {
+    name: "Liquidation Addresses",
+    file: "liquidationAddress",
+    icon: Building,
+    color: "teal",
+    description: "Crypto liquidation address management"
+  },
+  {
+    name: "Prefunded Accounts",
+    file: "prefundedAccount",
+    icon: Wallet,
+    color: "violet",
+    description: "Pre-funded account configuration"
+  },
+  {
+    name: "KYC Links",
+    file: "kycLink",
+    icon: LinkIcon,
+    color: "amber",
+    description: "KYC verification link generation"
+  },
+  {
+    name: "Developer Tools",
+    file: "developer",
+    icon: Settings,
+    color: "slate",
+    description: "Developer fee configuration and tools"
+  },
+  {
+    name: "Webhooks",
+    file: "webhook",
+    icon: Webhook,
+    color: "rose",
+    description: "Event notifications and webhooks"
+  },
+  {
+    name: "FX Rates",
+    file: "fxrate",
+    icon: TrendingUp,
+    color: "emerald",
+    description: "Foreign exchange rate queries"
+  },
+  {
+    name: "Transaction Status",
+    file: "transactionStatus",
+    icon: FileText,
+    color: "sky",
+    description: "Transfer status definitions and tracking"
+  }
+];
+
+const colorClasses: Record<string, { bg: string; text: string; border: string; hover: string }> = {
+  blue: { bg: "bg-blue-600/10", text: "text-blue-500", border: "border-blue-500/30", hover: "hover:border-blue-500/60" },
+  green: { bg: "bg-green-600/10", text: "text-green-500", border: "border-green-500/30", hover: "hover:border-green-500/60" },
+  purple: { bg: "bg-purple-600/10", text: "text-purple-500", border: "border-purple-500/30", hover: "hover:border-purple-500/60" },
+  pink: { bg: "bg-pink-600/10", text: "text-pink-500", border: "border-pink-500/30", hover: "hover:border-pink-500/60" },
+  orange: { bg: "bg-orange-600/10", text: "text-orange-500", border: "border-orange-500/30", hover: "hover:border-orange-500/60" },
+  cyan: { bg: "bg-cyan-600/10", text: "text-cyan-500", border: "border-cyan-500/30", hover: "hover:border-cyan-500/60" },
+  indigo: { bg: "bg-indigo-600/10", text: "text-indigo-500", border: "border-indigo-500/30", hover: "hover:border-indigo-500/60" },
+  teal: { bg: "bg-teal-600/10", text: "text-teal-500", border: "border-teal-500/30", hover: "hover:border-teal-500/60" },
+  violet: { bg: "bg-violet-600/10", text: "text-violet-500", border: "border-violet-500/30", hover: "hover:border-violet-500/60" },
+  amber: { bg: "bg-amber-600/10", text: "text-amber-500", border: "border-amber-500/30", hover: "hover:border-amber-500/60" },
+  slate: { bg: "bg-slate-600/10", text: "text-slate-400", border: "border-slate-500/30", hover: "hover:border-slate-500/60" },
+  rose: { bg: "bg-rose-600/10", text: "text-rose-500", border: "border-rose-500/30", hover: "hover:border-rose-500/60" },
+  emerald: { bg: "bg-emerald-600/10", text: "text-emerald-500", border: "border-emerald-500/30", hover: "hover:border-emerald-500/60" },
+  sky: { bg: "bg-sky-600/10", text: "text-sky-500", border: "border-sky-500/30", hover: "hover:border-sky-500/60" },
+};
 
 export default function Home() {
   return (
@@ -15,7 +134,7 @@ export default function Home() {
           </div>
           <Link href="/docs">
             <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
-              View Documentation
+              View All Documentation
             </Button>
           </Link>
         </div>
@@ -34,13 +153,15 @@ export default function Home() {
             <Link href="/docs">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8">
                 <Book className="mr-2 h-5 w-5" />
-                Browse API Docs
+                Browse All APIs
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800 text-lg px-8">
-              <FileText className="mr-2 h-5 w-5" />
-              Download OpenAPI Spec
-            </Button>
+            <a href="/openapi.yaml" download>
+              <Button size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800 text-lg px-8">
+                <FileText className="mr-2 h-5 w-5" />
+                Download OpenAPI Spec
+              </Button>
+            </a>
           </div>
         </div>
       </section>
@@ -170,30 +291,35 @@ export default function Home() {
         </div>
       </section>
 
-      {/* API Modules Section */}
+      {/* API Modules Navigation Section */}
       <section className="container mx-auto px-4 py-16">
-        <h3 className="text-3xl font-bold text-white text-center mb-12">Available API Modules</h3>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-          {[
-            "Customer Management",
-            "Transfer Operations", 
-            "Wallet Services",
-            "Card Management",
-            "External Accounts",
-            "Virtual Accounts",
-            "Batch Settlement",
-            "Liquidation Address",
-            "Prefunded Accounts",
-            "KYC Links",
-            "Developer Tools",
-            "Webhooks",
-            "FX Rates",
-            "Transaction Status"
-          ].map((module) => (
-            <div key={module} className="bg-slate-800/30 border border-slate-700 rounded-lg p-4 hover:bg-slate-800/50 transition-colors">
-              <p className="text-slate-200 font-medium">{module}</p>
-            </div>
-          ))}
+        <div className="text-center mb-12">
+          <h3 className="text-3xl font-bold text-white mb-4">Explore API Modules</h3>
+          <p className="text-slate-300 text-lg">Click on any module to jump directly to its documentation</p>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-7xl mx-auto">
+          {API_MODULES.map((module) => {
+            const Icon = module.icon;
+            const colors = colorClasses[module.color];
+            return (
+              <Link key={module.file} href={`/docs#tag/${module.file}`}>
+                <div className={`group bg-slate-800/30 border ${colors.border} ${colors.hover} rounded-lg p-5 transition-all cursor-pointer hover:bg-slate-800/50 hover:scale-105`}>
+                  <div className="flex items-start gap-3">
+                    <div className={`${colors.bg} rounded-lg p-2.5 flex-shrink-0`}>
+                      <Icon className={`h-5 w-5 ${colors.text}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-white font-semibold text-sm mb-1 group-hover:text-blue-400 transition-colors flex items-center justify-between">
+                        <span className="truncate">{module.name}</span>
+                        <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-1" />
+                      </h4>
+                      <p className="text-slate-400 text-xs leading-relaxed">{module.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 

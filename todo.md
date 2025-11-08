@@ -50,3 +50,10 @@ Create an interactive API documentation website from OpenAPI YAML specifications
 - [x] Configure vite.config.ts for GitHub Pages
 - [x] Create step-by-step deployment guide
 - [x] Test build process
+
+
+## New Request: Add Module Navigation on Homepage
+- [x] Analyze 14 YAML files to extract module information
+- [x] Design module navigation cards with direct links
+- [x] Update Home page with clickable module navigation
+- [x] Test navigation links to specific API sections
