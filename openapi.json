@@ -6393,7 +6393,7 @@
             "description": "事件 ID"
           },
           "type": {
-            "$ref": "#/components/parameters/EventType/schema"
+            "$ref": "#/components/schemas/EventType"
           },
           "customer_id": {
             "type": "string",

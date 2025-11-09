@@ -325,7 +325,7 @@ components:
       required: [id, type, customer_id, virtual_account_id, created_at]
       properties:
         id: { type: string, format: uuid, description: 事件 ID }
-        type: { $ref: '#/components/parameters/EventType/schema' }
+        type: { $ref: '#/components/schemas/EventType' }
         customer_id: { type: string, format: uuid }
         virtual_account_id: { type: string, format: uuid }
         amount: { type: string }
