@@ -57,3 +57,25 @@ Create an interactive API documentation website from OpenAPI YAML specifications
 - [x] Design module navigation cards with direct links
 - [x] Update Home page with clickable module navigation
 - [x] Test navigation links to specific API sections
+
+
+## New Request: Publish to GitHub
+- [x] Configure vite.config.ts base path for ctbz-api-doc
+- [x] Initialize git repository
+- [x] Push code to BigFanzei/ctbz-api-doc
+- [x] Verify GitHub Actions deployment
+- [x] Provide deployment URL to user
+
+
+## Bug Fix: GitHub Actions pnpm version conflict
+- [x] Fix pnpm version mismatch in deploy.yml
+- [x] Push fix to GitHub
+- [x] Verify deployment succeeds
+
+
+## Bug Fix: GitHub Pages 404 error
+- [x] Fix build output path in deploy.yml
+- [x] Add .nojekyll file
+- [x] Add 404.html for SPA routing
+- [ ] Debug persistent 404 issue
+- [ ] Check GitHub Pages settings
