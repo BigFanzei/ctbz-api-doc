@@ -39,16 +39,10 @@
                 defaultModelExpandDepth: 1,
                 docExpansion: "list",
                 filter: true,
-                tryItOutEnabled: true,
-                onComplete: function() {
-                    console.log('✅ Loaded successfully');
-                    const spec = this.specSelectors.spec().toJS();
-                    console.log('OpenAPI version:', spec.openapi);
-                    console.log('Title:', spec.info?.title);
-                    console.log('Paths count:', Object.keys(spec.paths || {}).length);
-                    console.log('Tags count:', (spec.tags || []).length);
-                }
+                tryItOutEnabled: true
             });
+            
+            console.log('✅ Swagger UI initialized');
         })();
     </script>
 </body>
