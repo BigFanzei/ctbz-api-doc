@@ -27,7 +27,7 @@ const mergedSpec = {
   tags: []
 };
 
-const files = fs.readdirSync(specsDir).filter(f => f.endsWith('.yaml'));
+const files = fs.readdirSync(specsDir).filter(f => f.endsWith('.yaml')).sort();
 
 console.log('Merging', files.length, 'YAML files...');
 
@@ -49,13 +49,11 @@ files.forEach(file => {
     Object.keys(spec.paths).forEach(pathKey => {
       const pathItem = spec.paths[pathKey];
 
-      // Add tag to each HTTP method
+      // Replace tags with filename-based tag for each HTTP method
       ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'].forEach(method => {
         if (pathItem[method]) {
-          if (!pathItem[method].tags) {
-            pathItem[method].tags = [];
-          }
-          pathItem[method].tags.push(tagName);
+          // Replace existing tags with only our filename-based tag
+          pathItem[method].tags = [tagName];
         }
       });
     });
