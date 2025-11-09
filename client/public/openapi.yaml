@@ -31,7 +31,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BatchSettlementSchedule'
       tags:
-        - Batch Settlement
+        - batchSettlement
   /customers/{customer_id}/card_accounts/{card_account_id}/pin:
     post:
       summary: Create card PIN change URL
@@ -51,7 +51,7 @@ paths:
                     type: string
                     format: uri
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/ephemeral_keys:
     post:
       summary: Generate key to reveal card details
@@ -83,7 +83,7 @@ paths:
                     type: string
                     description: 传输密钥（5 分钟轮换）
       tags:
-        - Card
+        - card
   /developer/cards/summary:
     get:
       summary: Get summary of card program
@@ -106,7 +106,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeveloperCardsSummary'
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}:
     get:
       summary: Get a card account
@@ -121,7 +121,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CardAccount'
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts:
     get:
       summary: Get all card accounts
@@ -142,7 +142,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/CardAccount'
       tags:
-        - Card
+        - card
     post:
       summary: Provision a card account
       description: 虚拟卡开卡（每个客户 1 张虚拟卡）
@@ -162,7 +162,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CardAccount'
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/freeze:
     post:
       summary: Freeze a card account
@@ -184,7 +184,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CardFreezeRecord'
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/unfreeze:
     post:
       summary: Unfreeze a card account
@@ -207,7 +207,7 @@ paths:
         default:
           description: Response
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/create_mobile_wallet_provisioning_request:
     post:
       summary: Create a mobile wallet push provisioning request
@@ -225,7 +225,7 @@ paths:
         default:
           description: Response
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/authorizations:
     get:
       summary: Get pending card authorizations
@@ -265,7 +265,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/CardAuthorization'
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/transactions:
     get:
       summary: Get card transactions
@@ -325,7 +325,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CardTransactionList'
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/transactions/{transaction_id}:
     get:
       summary: Get a card transaction
@@ -337,7 +337,7 @@ paths:
         default:
           description: Response
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/auth_controls:
     get:
       summary: Get authorization controls
@@ -352,7 +352,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthControls'
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/deposit_addresses:
     post:
       summary: Provision an additional top-up deposit address for the card account
@@ -379,7 +379,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DepositAddress'
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/withdrawals:
     get:
       summary: Get withdrawal history of funds
@@ -405,7 +405,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/CardWithdrawal'
       tags:
-        - Card
+        - card
     post:
       summary: Create fund withdrawal request
       description: 创建提现请求
@@ -422,7 +422,7 @@ paths:
         default:
           description: Response
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/withdrawals/{card_withdrawal_id}:
     get:
       summary: Get a card withdrawal
@@ -435,7 +435,7 @@ paths:
         default:
           description: Response
       tags:
-        - Card
+        - card
   /customers/{customer_id}/card_accounts/{card_account_id}/statements/{period}.pdf:
     post:
       summary: Generate a card account statement (PDF)
@@ -452,7 +452,7 @@ paths:
                 type: string
                 format: binary
       tags:
-        - Card
+        - card
   /customers:
     get:
       summary: Get all customers
@@ -480,7 +480,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/Customer'
       tags:
-        - Customer
+        - customer
     post:
       summary: Create a customer
       description: 创建个人或企业客户
@@ -507,7 +507,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Customer'
       tags:
-        - Customer
+        - customer
   /customers/{customer_id}:
     get:
       summary: Get a single customer
@@ -522,7 +522,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Customer'
       tags:
-        - Customer
+        - customer
     put:
       summary: Update a single customer
       description: 使用 PUT 更新客户信息；体结构与创建时一致（区分个人/企业）
@@ -544,7 +544,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Customer'
       tags:
-        - Customer
+        - customer
     delete:
       summary: Delete a single customer
       description: 删除单个客户对象
@@ -564,7 +564,7 @@ paths:
                     type: string
                     format: uuid
       tags:
-        - Customer
+        - customer
   /customers/{customer_id}/associated_persons:
     post:
       summary: Create an associated person
@@ -585,7 +585,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AssociatedPerson'
       tags:
-        - Customer
+        - customer
   /customers/{customer_id}/associated_persons/{associated_person_id}:
     get:
       summary: Get a single associated person
@@ -600,7 +600,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AssociatedPerson'
       tags:
-        - Customer
+        - customer
     put:
       summary: Update a single associated person
       parameters:
@@ -620,7 +620,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AssociatedPerson'
       tags:
-        - Customer
+        - customer
     delete:
       summary: Delete a single associated person
       parameters:
@@ -640,7 +640,7 @@ paths:
                     type: string
                     format: uuid
       tags:
-        - Customer
+        - customer
   /customers/{customer_id}/tos_acceptance_link:
     get:
       summary: Get URL for ToS acceptance for a customer
@@ -654,7 +654,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LinkResponse'
       tags:
-        - Customer
+        - customer
   /customers/{customer_id}/kyc_link:
     get:
       summary: Get a KYC link for a customer
@@ -669,7 +669,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LinkResponse'
       tags:
-        - Customer
+        - customer
   /customers/{customer_id}/transfers:
     get:
       summary: Get all transfers for a customer
@@ -716,7 +716,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/Transfer'
       tags:
-        - Customer
+        - customer
   /customers/{customer_id}/static_templates:
     get:
       summary: Get all templates for a customer
@@ -733,7 +733,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TransferTemplate'
       tags:
-        - Customer
+        - customer
   /customers/tos_links:
     post:
       summary: Request a hosted URL for ToS acceptance (new customer)
@@ -753,7 +753,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LinkResponse'
       tags:
-        - Customer
+        - customer
   /developer/fees:
     get:
       summary: Get configured fee
@@ -767,7 +767,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FeeConfig'
       tags:
-        - Developer
+        - developer
     post:
       summary: Update the configured fee
       description: 更新组织层面的清算地址费率（BPS），字符串小数表示
@@ -781,7 +781,7 @@ paths:
         default:
           description: Response
       tags:
-        - Developer
+        - developer
   /developer/fee_external_account:
     get:
       summary: Get the configured fee external account
@@ -794,7 +794,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FeeExternalAccount'
       tags:
-        - Developer
+        - developer
     post:
       summary: Configure a fee external account
       description: 配置或更新用于费用结算/分润的外部收款账户
@@ -808,7 +808,7 @@ paths:
         default:
           description: Response
       tags:
-        - Developer
+        - developer
   /customers/{customer_id}/external_accounts:
     get:
       summary: Get all external accounts for a customer
@@ -836,7 +836,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/ExternalAccount'
       tags:
-        - External Account
+        - externalAccount
     post:
       summary: Create a new external account for a customer
       description: 为客户新增外部账户
@@ -856,7 +856,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExternalAccount'
       tags:
-        - External Account
+        - externalAccount
   /customers/{customer_id}/external_accounts/{external_account_id}:
     get:
       summary: Retrieve an external account
@@ -871,7 +871,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExternalAccount'
       tags:
-        - External Account
+        - externalAccount
     put:
       summary: Update an external account
       description: 仅更新指定字段（如地址、账户路由信息等）
@@ -892,7 +892,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExternalAccount'
       tags:
-        - External Account
+        - externalAccount
     delete:
       summary: Delete a single external account
       parameters:
@@ -912,7 +912,7 @@ paths:
                     type: string
                     format: uuid
       tags:
-        - External Account
+        - externalAccount
   /customers/{customer_id}/external_accounts/{external_account_id}/reactivate:
     post:
       summary: Reactivate an external account
@@ -927,7 +927,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExternalAccount'
       tags:
-        - External Account
+        - externalAccount
   /external_accounts:
     get:
       summary: Get all external accounts (all)
@@ -954,7 +954,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/ExternalAccount'
       tags:
-        - External Account
+        - externalAccount
   /exchange_rate:
     get:
       summary: Get FX rate
@@ -980,7 +980,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExchangeRate'
       tags:
-        - Fxrate
+        - fxrate
   /kyc_links:
     get:
       summary: Get all KYC links
@@ -1009,7 +1009,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/KycLink'
       tags:
-        - Kyc Link
+        - kycLink
     post:
       summary: Generate a link for an individual or business to perform KYC
       description: 为个人或企业生成执行 KYC 的链接
@@ -1027,7 +1027,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/KycLink'
       tags:
-        - Kyc Link
+        - kycLink
   /kyc_links/{kyc_link_id}:
     get:
       summary: Check status of a KYC link
@@ -1042,7 +1042,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/KycLink'
       tags:
-        - Kyc Link
+        - kycLink
   /customers/{customer_id}/liquidation_addresses:
     get:
       summary: Get all liquidation addresses for a customer
@@ -1070,7 +1070,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/LiquidationAddress'
       tags:
-        - Liquidation Address
+        - liquidationAddress
     post:
       summary: Create a liquidation address
       description: 为客户创建新的清算地址
@@ -1090,7 +1090,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LiquidationAddress'
       tags:
-        - Liquidation Address
+        - liquidationAddress
   /liquidation_addresses:
     get:
       summary: Get all liquidation addresses (all customers)
@@ -1117,7 +1117,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/LiquidationAddress'
       tags:
-        - Liquidation Address
+        - liquidationAddress
   /customers/{customer_id}/liquidation_addresses/{liquidation_address_id}:
     get:
       summary: Get a liquidation address
@@ -1132,7 +1132,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LiquidationAddress'
       tags:
-        - Liquidation Address
+        - liquidationAddress
     put:
       summary: Update a liquidation address
       parameters:
@@ -1152,7 +1152,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LiquidationAddress'
       tags:
-        - Liquidation Address
+        - liquidationAddress
   /customers/{customer_id}/liquidation_addresses/{liquidation_address_id}/drains:
     get:
       summary: Get drain history of a liquidation address
@@ -1175,7 +1175,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/LiquidationDrain'
       tags:
-        - Liquidation Address
+        - liquidationAddress
   /liquidation_address/drains:
     get:
       summary: Liquidation address activity across all customers
@@ -1204,7 +1204,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/LiquidationDrain'
       tags:
-        - Liquidation Address
+        - liquidationAddress
   /prefunded_accounts:
     get:
       summary: Get a list of all prefunded accounts
@@ -1219,7 +1219,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/PrefundedAccount'
       tags:
-        - Prefunded Account
+        - prefundedAccount
   /prefunded_accounts/{prefunded_account_id}:
     get:
       summary: Get details for a specific prefunded account
@@ -1233,7 +1233,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PrefundedAccount'
       tags:
-        - Prefunded Account
+        - prefundedAccount
   /prefunded_accounts/{prefunded_account_id}/history:
     get:
       summary: Get funding history of a prefunded account
@@ -1252,7 +1252,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/PrefundedAccountHistory'
       tags:
-        - Prefunded Account
+        - prefundedAccount
   /transfers:
     get:
       summary: Get all transfers
@@ -1308,7 +1308,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/Transfer'
       tags:
-        - Transfer
+        - transfer
     post:
       summary: Create a transfer
       description: 创建一笔转账
@@ -1326,7 +1326,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Transfer'
       tags:
-        - Transfer
+        - transfer
   /transfers/{transfer_id}:
     get:
       summary: Get a transfer
@@ -1340,7 +1340,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Transfer'
       tags:
-        - Transfer
+        - transfer
     put:
       summary: Update a transfer
       description: 仅允许在状态为 `awaiting_funds` 的交易上更新金额/费用等字段
@@ -1360,7 +1360,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Transfer'
       tags:
-        - Transfer
+        - transfer
     delete:
       summary: Delete a transfer
       description: 仅允许在状态为 `awaiting_funds` 的交易上执行删除
@@ -1380,7 +1380,7 @@ paths:
                     type: string
                     format: uuid
       tags:
-        - Transfer
+        - transfer
   /transfers/static_templates:
     get:
       summary: Get all static templates
@@ -1399,7 +1399,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/TransferTemplate'
       tags:
-        - Transfer
+        - transfer
   /customers/{customer_id}/virtual_accounts:
     get:
       summary: List VA by customer
@@ -1427,7 +1427,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/VirtualAccount'
       tags:
-        - Virtual Account
+        - virtualAccount
     post:
       summary: Create a VA
       description: 为客户创建一个新的虚拟账户（VA）
@@ -1447,7 +1447,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/VirtualAccount'
       tags:
-        - Virtual Account
+        - virtualAccount
   /customers/{customer_id}/virtual_accounts/{virtual_account_id}:
     get:
       summary: Get a VA
@@ -1462,7 +1462,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/VirtualAccount'
       tags:
-        - Virtual Account
+        - virtualAccount
     put:
       summary: Update a VA
       parameters:
@@ -1482,7 +1482,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/VirtualAccount'
       tags:
-        - Virtual Account
+        - virtualAccount
   /customers/{customer_id}/virtual_accounts/{virtual_account_id}/deactive:
     post:
       summary: Deactivate a VA
@@ -1493,7 +1493,7 @@ paths:
         default:
           description: Response
       tags:
-        - Virtual Account
+        - virtualAccount
   /customers/{customer_id}/virtual_accounts/{virtual_account_id}/reactive:
     post:
       summary: Reactivate a VA
@@ -1504,7 +1504,7 @@ paths:
         default:
           description: Response
       tags:
-        - Virtual Account
+        - virtualAccount
   /customers/{customer_id}/virtual_accounts/{virtual_account_id}/activities:
     get:
       summary: VA activities
@@ -1536,7 +1536,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/VAActivity'
       tags:
-        - Virtual Account
+        - virtualAccount
   /virtual_accounts:
     get:
       summary: List VA (all customers)
@@ -1550,7 +1550,7 @@ paths:
         default:
           description: Response
       tags:
-        - Virtual Account
+        - virtualAccount
   /virtual_accounts/history:
     get:
       summary: VA activities across all customers
@@ -1581,7 +1581,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/VAActivity'
       tags:
-        - Virtual Account
+        - virtualAccount
   /wallets:
     get:
       summary: Get wallets
@@ -1609,7 +1609,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/Wallet'
       tags:
-        - Wallet
+        - wallet
   /wallets/total-balance:
     get:
       summary: Get total balance of all wallets
@@ -1622,7 +1622,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TotalBalance'
       tags:
-        - Wallet
+        - wallet
   /wallets/{wallet_id}/history:
     get:
       summary: Get transaction history of a wallet
@@ -1667,7 +1667,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/Transaction'
       tags:
-        - Wallet
+        - wallet
   /customers/{customer_id}/wallets:
     get:
       summary: Get all wallets for a customer
@@ -1700,7 +1700,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/Wallet'
       tags:
-        - Wallet
+        - wallet
     post:
       summary: Create a wallet
       description: 为指定客户新建钱包（幂等）。
@@ -1736,7 +1736,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Wallet'
       tags:
-        - Wallet
+        - wallet
   /customers/{customer_id}/wallets/{wallet_id}:
     get:
       summary: Get a wallet
@@ -1769,7 +1769,7 @@ paths:
                         items:
                           $ref: '#/components/schemas/BalanceItem'
       tags:
-        - Wallet
+        - wallet
   /webhooks:
     get:
       summary: Get all webhook endpoints (active & inactive)
@@ -1787,7 +1787,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/WebhookEndpoint'
       tags:
-        - Webhook
+        - webhook
     post:
       summary: Create a webhook endpoint
       description: 创建新的 Webhook 端点
@@ -1805,7 +1805,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WebhookEndpoint'
       tags:
-        - Webhook
+        - webhook
     put:
       summary: Update a webhook
       description: 更新已有 Webhook 端点；按请求体中的 id 指定目标端点
@@ -1823,7 +1823,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WebhookEndpoint'
       tags:
-        - Webhook
+        - webhook
   /webhooks/{webhook_id}:
     delete:
       summary: Delete a webhook
@@ -1834,7 +1834,7 @@ paths:
         default:
           description: Response
       tags:
-        - Webhook
+        - webhook
   /webhooks/{webhook_id}/events:
     get:
       summary: List upcoming events
@@ -1854,7 +1854,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/WebhookEventPreview'
       tags:
-        - Webhook
+        - webhook
   /webhooks/{webhook_id}/logs:
     get:
       summary: View logs
@@ -1876,7 +1876,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/WebhookDeliveryLog'
       tags:
-        - Webhook
+        - webhook
   /webhooks/{webhook_id}/send:
     post:
       summary: Send event (echo test)
@@ -1897,7 +1897,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/WebhookEchoSendResponse'
       tags:
-        - Webhook
+        - webhook
 components:
   schemas:
     CurrencyCode:
@@ -4678,33 +4678,46 @@ components:
       scheme: bearer
       bearerFormat: JWT
 tags:
-  - name: Batch Settlement
+  - name: batchSettlement
     description: 批量清算计划创建接口（无示例、无状态码版）
-  - name: Card
+    x-displayName: Batch Settlement
+  - name: card
     description: 卡账户、PIN、移动钱包、交易、授权控制与对账单接口（无示例、无状态码版）
-  - name: Customer
+    x-displayName: Card
+  - name: customer
     description: 客户、关联人员、交易与链接相关接口（无示例、无状态码版）
-  - name: Developer
+    x-displayName: Customer
+  - name: developer
     description: 组织维度的清算地址费率与费用收款外部账户配置（无示例、无状态码版）
-  - name: External Account
+    x-displayName: Developer
+  - name: externalAccount
     description: 客户外部账户的查询、创建、更新、删除与激活
-  - name: Fxrate
+    x-displayName: External Account
+  - name: fxrate
     description: 外汇与加密货币汇率查询接口（无示例、无状态码版）
-  - name: Kyc Link
+    x-displayName: Fxrate
+  - name: kycLink
     description: 个体与企业的 KYC 链接管理（无示例、无状态码版）
-  - name: Liquidation Address
+    x-displayName: Kyc Link
+  - name: liquidationAddress
     description: 清算地址与资金流（Drains）接口（无示例、无状态码版）
-  - name: Prefunded Account
+    x-displayName: Liquidation Address
+  - name: prefundedAccount
     description: 预充值账户查询与历史记录（无示例、无状态码版）
-  - name: Transfer
+    x-displayName: Prefunded Account
+  - name: transfer
     description: 平台转账接口（无示例、无状态码版）
-  - name: Virtual Account
+    x-displayName: Transfer
+  - name: virtualAccount
     description: 管理虚拟账户（VA）及其资金活动的接口定义（无示例、无状态码版）
-  - name: Wallet
+    x-displayName: Virtual Account
+  - name: wallet
     description: |
       钱包与交易查询接口（无示例 & 无状态码版）。
       - 统一使用 ISO 8601 UTC 时间（format: date-time）
       - 统一错误结构：code / message / details / trace_id
       - 分页参数：limit / starting_after / ending_before
-  - name: Webhook
+    x-displayName: Wallet
+  - name: webhook
     description: Webhook 端点管理、事件预览、投递日志与回环测试（无示例、无状态码版）
+    x-displayName: Webhook

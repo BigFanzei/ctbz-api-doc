@@ -51,9 +51,12 @@ files.forEach(file => {
   const content = fs.readFileSync(path.join(specsDir, file), 'utf8');
   const spec = yaml.load(content);
 
-  // 从文件名生成 tag 名称（去掉 .yaml 后缀，首字母大写）
-  const tagName = file.replace('.yaml', '')
-    .replace(/([A-Z])/g, ' $1')  // 在大写字母前添加空格
+  // 从文件名生成 tag 名称（去掉 .yaml 后缀，保持 camelCase）
+  const tagName = file.replace('.yaml', '');
+
+  // 生成显示名称（首字母大写，在大写字母前添加空格）
+  const displayName = tagName
+    .replace(/([A-Z])/g, ' $1')
     .trim()
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -62,10 +65,11 @@ files.forEach(file => {
   // 合并paths，并为每个操作添加 tag
   if (spec.paths && Object.keys(spec.paths).length > 0) {
     // 只有当文件包含 paths 时才添加 tag 定义
-    const tagDescription = spec.info?.description || `${tagName} related APIs`;
+    const tagDescription = spec.info?.description || `${displayName} related APIs`;
     tagSet.add(JSON.stringify({
-      name: tagName,
-      description: tagDescription
+      name: tagName,  // 使用 camelCase 作为 tag name
+      description: tagDescription,
+      'x-displayName': displayName  // 使用 Title Case 作为显示名称
     }));
 
     Object.keys(spec.paths).forEach(pathKey => {
