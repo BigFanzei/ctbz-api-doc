@@ -6,77 +6,43 @@ const specsDir = path.join(__dirname, 'specs');
 const outputYamlFile = path.join(__dirname, 'openapi.yaml');
 const outputJsonFile = path.join(__dirname, 'openapi.json');
 
-// 读取所有YAML文件
-const files = fs.readdirSync(specsDir).filter(f => f.endsWith('.yaml'));
-
-console.log(`Found ${files.length} YAML files:`);
-files.forEach(f => console.log(`  - ${f}`));
-
-// 创建合并后的规范
+// Initialize the base OpenAPI structure
 const mergedSpec = {
   openapi: '3.0.4',
   info: {
     title: 'CTBZ API Documentation',
     version: '1.0.0',
-    description: '完整的API文档，包含所有端点和模型定义'
+    description: 'Complete API documentation'
   },
   servers: [
-    { url: 'https://api.example.com', description: 'Production' },
-    { url: 'https://sandbox.api.example.com', description: 'Sandbox' }
+    {
+      url: 'https://api.example.com',
+      description: 'Production'
+    }
   ],
-  security: [{ ApiKeyAuth: [] }],
   paths: {},
   components: {
     schemas: {},
     parameters: {},
-    securitySchemes: {
-      ApiKeyAuth: {
-        type: 'apiKey',
-        in: 'header',
-        name: 'Authorization'
-      }
-    }
-  },
-  tags: []
+    securitySchemes: {}
+  }
 };
 
-const tagSet = new Set();
+// Read all YAML files
+const files = fs.readdirSync(specsDir).filter(f => f.endsWith('.yaml'));
 
-// 合并每个文件
+console.log('Merging', files.length, 'YAML files...');
+
 files.forEach(file => {
   const content = fs.readFileSync(path.join(specsDir, file), 'utf8');
   const spec = yaml.load(content);
 
-  // 从文件名生成 tag 名称（camelCase 格式）
-  const tagName = file.replace('.yaml', '');
-
-  // 合并paths，并为每个操作添加 tag
-  if (spec.paths && Object.keys(spec.paths).length > 0) {
-    // 只有当文件包含 paths 时才添加 tag 定义
-    const tagDescription = spec.info?.description || `${tagName} related APIs`;
-    tagSet.add(JSON.stringify({
-      name: tagName,
-      description: tagDescription
-    }));
-
-    Object.keys(spec.paths).forEach(pathKey => {
-      const pathItem = spec.paths[pathKey];
-      // 为每个 HTTP 方法添加 tag
-      ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'].forEach(method => {
-        if (pathItem[method]) {
-          if (!pathItem[method].tags) {
-            pathItem[method].tags = [];
-          }
-          if (!pathItem[method].tags.includes(tagName)) {
-            pathItem[method].tags.push(tagName);
-          }
-        }
-      });
-    });
+  // Merge paths
+  if (spec.paths) {
     Object.assign(mergedSpec.paths, spec.paths);
   }
 
-  // 合并components
+  // Merge components
   if (spec.components) {
     if (spec.components.schemas) {
       Object.assign(mergedSpec.components.schemas, spec.components.schemas);
@@ -88,23 +54,14 @@ files.forEach(file => {
       Object.assign(mergedSpec.components.securitySchemes, spec.components.securitySchemes);
     }
   }
-
-  // 收集tags
-  if (spec.tags) {
-    spec.tags.forEach(tag => tagSet.add(JSON.stringify(tag)));
-  }
 });
 
-// 添加tags
-mergedSpec.tags = Array.from(tagSet).map(t => JSON.parse(t));
-
-// 写入 YAML 和 JSON 格式
+// Write output files
 fs.writeFileSync(outputYamlFile, yaml.dump(mergedSpec, { lineWidth: -1 }));
 fs.writeFileSync(outputJsonFile, JSON.stringify(mergedSpec, null, 2));
 
-console.log(`\n✅ Merged specification written to:`);
-console.log(`   - ${outputYamlFile}`);
-console.log(`   - ${outputJsonFile}`);
-console.log(`   Total paths: ${Object.keys(mergedSpec.paths).length}`);
-console.log(`   Total schemas: ${Object.keys(mergedSpec.components.schemas).length}`);
-console.log(`   Total tags: ${mergedSpec.tags.length}`);
+console.log('✅ Merged specification written to:');
+console.log('   - openapi.yaml');
+console.log('   - openapi.json');
+console.log('   Total paths:', Object.keys(mergedSpec.paths).length);
+console.log('   Total schemas:', Object.keys(mergedSpec.components.schemas).length);

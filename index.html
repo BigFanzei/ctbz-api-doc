@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CTBZ API Documentation</title>
-    <link rel="icon" href="data:,">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css" />
     <style>
         body {
@@ -15,10 +14,6 @@
             max-width: 1460px;
             margin: 0 auto;
         }
-        /* Hide spurious version pragma errors during initialization */
-        .version-pragma {
-            display: none !important;
-        }
     </style>
 </head>
 <body>
@@ -26,45 +21,15 @@
     <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
     <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
     <script>
-        fetch('./openapi.json?t=' + Date.now())
-            .then(response => response.json())
-            .then(spec => {
-                console.log('✅ Spec loaded:', spec.openapi);
-                console.log('Tags:', spec.tags?.length);
-                console.log('Paths:', Object.keys(spec.paths || {}).length);
-
-                window.ui = SwaggerUIBundle({
-                    spec: spec,
-                    dom_id: '#swagger-ui',
-                    deepLinking: true,
-                    validatorUrl: null,
-                    presets: [
-                        SwaggerUIBundle.presets.apis,
-                        SwaggerUIStandalonePreset
-                    ],
-                    layout: "StandaloneLayout",
-                    defaultModelsExpandDepth: 1,
-                    defaultModelExpandDepth: 1,
-                    docExpansion: "list",
-                    filter: true,
-                    tryItOutEnabled: true
-                });
-
-                // Remove any lingering version pragma errors after render
-                setTimeout(() => {
-                    const errors = document.querySelectorAll('.version-pragma');
-                    if (errors.length > 0) {
-                        errors.forEach(el => el.remove());
-                        console.log('✅ Cleaned up', errors.length, 'spurious error elements');
-                    }
-                }, 1000);
-            })
-            .catch(err => {
-                console.error('❌ Failed to load spec:', err);
-                document.getElementById('swagger-ui').innerHTML =
-                    '<div style="padding: 40px; text-align: center;"><h1>Failed to load API specification</h1><pre>' +
-                    err + '</pre></div>';
-            });
+        window.ui = SwaggerUIBundle({
+            url: './openapi.json',
+            dom_id: '#swagger-ui',
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+            ],
+            layout: "StandaloneLayout"
+        });
     </script>
 </body>
 </html>
