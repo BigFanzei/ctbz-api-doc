@@ -49,12 +49,41 @@ const tagSet = new Set();
 files.forEach(file => {
   const content = fs.readFileSync(path.join(specsDir, file), 'utf8');
   const spec = yaml.load(content);
-  
-  // 合并paths
+
+  // 从文件名生成 tag 名称（去掉 .yaml 后缀，首字母大写）
+  const tagName = file.replace('.yaml', '')
+    .replace(/([A-Z])/g, ' $1')  // 在大写字母前添加空格
+    .trim()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+  // 添加 tag 定义
+  const tagDescription = spec.info?.description || `${tagName} related APIs`;
+  tagSet.add(JSON.stringify({
+    name: tagName,
+    description: tagDescription
+  }));
+
+  // 合并paths，并为每个操作添加 tag
   if (spec.paths) {
+    Object.keys(spec.paths).forEach(pathKey => {
+      const pathItem = spec.paths[pathKey];
+      // 为每个 HTTP 方法添加 tag
+      ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'].forEach(method => {
+        if (pathItem[method]) {
+          if (!pathItem[method].tags) {
+            pathItem[method].tags = [];
+          }
+          if (!pathItem[method].tags.includes(tagName)) {
+            pathItem[method].tags.push(tagName);
+          }
+        }
+      });
+    });
     Object.assign(mergedSpec.paths, spec.paths);
   }
-  
+
   // 合并components
   if (spec.components) {
     if (spec.components.schemas) {
@@ -67,8 +96,8 @@ files.forEach(file => {
       Object.assign(mergedSpec.components.securitySchemes, spec.components.securitySchemes);
     }
   }
-  
-  // 收集tags
+
+  // 收集tags（保留原有的 tags）
   if (spec.tags) {
     spec.tags.forEach(tag => tagSet.add(JSON.stringify(tag)));
   }
