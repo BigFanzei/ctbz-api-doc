@@ -23,6 +23,13 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    commonjsOptions: {
+      include: [/node_modules/],
+      exclude: [/swagger-ui-react/],
+    },
+  },
+  optimizeDeps: {
+    exclude: ['swagger-ui-react'],
   },
   server: {
     port: 3000,
