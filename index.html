@@ -46,7 +46,7 @@
             window.sessionStorage.clear();
         }
 
-        fetch('./openapi.json?v6=' + Date.now())
+        fetch('./openapi.json?v7=' + Date.now())
             .then(r => r.json())
             .then(spec => {
                 console.log('Loaded spec with', spec.tags.length, 'tags');

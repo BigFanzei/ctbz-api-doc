@@ -6055,68 +6055,6 @@
           }
         }
       },
-      "TransferStatus": {
-        "type": "string",
-        "description": "交易状态（Transaction Status）",
-        "enum": [
-          "awaiting_funds",
-          "in_review",
-          "funds_received",
-          "payment_submitted",
-          "payment_processed",
-          "undeliverable",
-          "returned",
-          "refunded",
-          "canceled",
-          "error"
-        ]
-      },
-      "TransferStatusDescriptions": {
-        "type": "object",
-        "description": "各交易状态详细说明",
-        "properties": {
-          "awaiting_funds": {
-            "type": "string",
-            "description": "EVONET 正在等待客户资金到账，尚未开始处理转账。 适用于加密货币充值、电汇或 ACH 入账。\n"
-          },
-          "in_review": {
-            "type": "string",
-            "description": "临时状态，表示转账数据需进一步验证。 一般数秒内自动解决，如持续超过 24 小时，EVONET 将联系客户。\n"
-          },
-          "funds_received": {
-            "type": "string",
-            "description": "EVONET 已收到客户资金，正在准备代表客户进行转账。\n"
-          },
-          "payment_submitted": {
-            "type": "string",
-            "description": "EVONET 已发起支付，正在等待确认。 完成时间取决于支付通道：加密货币几分钟，电汇数小时，ACH 可能需数天。\n"
-          },
-          "payment_processed": {
-            "type": "string",
-            "description": "转账已完成，资金成功到达目标账户。\n"
-          },
-          "undeliverable": {
-            "type": "string",
-            "description": "EVONET 未能完成转账，可能原因包括无效的目标账户或目标不支持该资产。\n"
-          },
-          "returned": {
-            "type": "string",
-            "description": "支付已发送但失败，资金退回 EVONET。系统将启动退款流程，将资金返还发起方。\n"
-          },
-          "refunded": {
-            "type": "string",
-            "description": "转账已退款，资金已返还给原始发送方。\n"
-          },
-          "canceled": {
-            "type": "string",
-            "description": "转账已被取消。仅可在 awaiting_funds 状态下通过 DELETE `/v0/transfers/{transferID}` 取消。\n"
-          },
-          "error": {
-            "type": "string",
-            "description": "处理过程中发生错误，无法继续。通常需要人工审核或开发者介入。\n"
-          }
-        }
-      },
       "TransferCreate": {
         "type": "object",
         "required": [
