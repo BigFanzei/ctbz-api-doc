@@ -5,7 +5,7 @@ export default function ApiDocs() {
   return (
     <div className="api-docs-container min-h-screen bg-background">
       <SwaggerUI
-        url="/openapi.yaml"
+        url="/ctbz-api-doc/openapi.yaml"
         deepLinking={true}
         displayOperationId={false}
         defaultModelsExpandDepth={1}

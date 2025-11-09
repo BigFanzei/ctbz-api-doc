@@ -79,3 +79,12 @@ Create an interactive API documentation website from OpenAPI YAML specifications
 - [x] Add 404.html for SPA routing
 - [ ] Debug persistent 404 issue
 - [ ] Check GitHub Pages settings
+
+
+## Bug Fix: Sub-page 404 on GitHub Pages
+- [x] Fix 404.html redirect logic for hash-based routes
+- [x] Update index.html to handle SPA routing on load
+- [x] Fix openapi.yaml path with base URL
+- [ ] Test all routes including /docs and hash routes
+- [ ] Push fix to GitHub
+- [ ] Verify all pages accessible

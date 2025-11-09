@@ -18,6 +18,17 @@
 
   <body>
     <div id="root"></div>
+    <!-- GitHub Pages SPA redirect recovery -->
+    <script>
+      // Restore the path that was stored by 404.html
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
     <script
       defer
