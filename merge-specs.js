@@ -38,9 +38,10 @@ files.forEach(file => {
   // Get tag name from filename (without .yaml extension)
   const tagName = file.replace('.yaml', '');
 
-  // Add tag definition
+  // Add tag definition with x-displayName for better rendering
   mergedSpec.tags.push({
     name: tagName,
+    'x-displayName': tagName.charAt(0).toUpperCase() + tagName.slice(1),
     description: `APIs from ${file}`
   });
 

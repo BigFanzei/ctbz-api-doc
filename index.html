@@ -3,6 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>CTBZ API Documentation</title>
     <link rel="icon" href="data:,">
     <style>
@@ -35,10 +38,17 @@
     <div id="redoc-container"></div>
     <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
     <script>
+        // Clear any cached Redoc state
+        if (window.localStorage) {
+            window.localStorage.clear();
+        }
+
         Redoc.init(
-            './openapi.json?t=' + Date.now(),
+            './openapi.json?v3=' + Date.now(),
             {
-                scrollYOffset: 68
+                scrollYOffset: 68,
+                disableSearch: false,
+                hideLoading: false
             },
             document.getElementById('redoc-container')
         );
