@@ -22,28 +22,38 @@
     <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
     <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
     <script>
-        (function() {
+        window.onload = function() {
             console.log('Initializing Swagger UI...');
 
-            window.ui = SwaggerUIBundle({
-                url: 'https://bigfanzei.github.io/ctbz-api-doc/openapi.json',
-                dom_id: '#swagger-ui',
-                deepLinking: true,
-                validatorUrl: null,
-                presets: [
-                    SwaggerUIBundle.presets.apis,
-                    SwaggerUIStandalonePreset
-                ],
-                layout: "StandaloneLayout",
-                defaultModelsExpandDepth: 1,
-                defaultModelExpandDepth: 1,
-                docExpansion: "list",
-                filter: true,
-                tryItOutEnabled: true
-            });
-            
-            console.log('✅ Swagger UI initialized');
-        })();
+            // Fetch and embed the spec directly to avoid timing issues
+            fetch('https://bigfanzei.github.io/ctbz-api-doc/openapi.json')
+                .then(response => response.json())
+                .then(spec => {
+                    console.log('Spec loaded, version:', spec.openapi);
+
+                    window.ui = SwaggerUIBundle({
+                        spec: spec,
+                        dom_id: '#swagger-ui',
+                        deepLinking: true,
+                        validatorUrl: null,
+                        presets: [
+                            SwaggerUIBundle.presets.apis,
+                            SwaggerUIStandalonePreset
+                        ],
+                        layout: "StandaloneLayout",
+                        defaultModelsExpandDepth: 1,
+                        defaultModelExpandDepth: 1,
+                        docExpansion: "list",
+                        filter: true,
+                        tryItOutEnabled: true
+                    });
+
+                    console.log('✅ Swagger UI initialized with spec');
+                })
+                .catch(err => {
+                    console.error('Failed to load spec:', err);
+                });
+        };
     </script>
 </body>
 </html>
