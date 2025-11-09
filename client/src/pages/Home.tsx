@@ -132,7 +132,7 @@ export default function Home() {
             <Book className="h-8 w-8 text-blue-500" />
             <h1 className="text-2xl font-bold text-white">API Documentation</h1>
           </div>
-          <Link href="/#/docs">
+          <Link href="/docs">
             <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
               View All Documentation
             </Button>
@@ -150,7 +150,7 @@ export default function Home() {
             Comprehensive documentation for all API endpoints, including customers, transfers, wallets, cards, and more.
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/#/docs">
+            <Link href="/docs">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8">
                 <Book className="mr-2 h-5 w-5" />
                 Browse All APIs
@@ -302,7 +302,7 @@ export default function Home() {
             const Icon = module.icon;
             const colors = colorClasses[module.color];
             return (
-              <Link key={module.file} href={`/docs#tag/${module.file}`}>
+              <a key={module.file} href={`/ctbz-api-doc/docs#tag/${module.file}`}>
                 <div className={`group bg-slate-800/30 border ${colors.border} ${colors.hover} rounded-lg p-5 transition-all cursor-pointer hover:bg-slate-800/50 hover:scale-105`}>
                   <div className="flex items-start gap-3">
                     <div className={`${colors.bg} rounded-lg p-2.5 flex-shrink-0`}>
@@ -317,7 +317,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-              </Link>
+              </a>
             );
           })}
         </div>
@@ -330,7 +330,7 @@ export default function Home() {
           <p className="text-slate-300 mb-8">
             Explore our comprehensive API documentation and start building your integration today.
           </p>
-          <Link href="/#/docs">
+          <Link href="/docs">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8">
               <Book className="mr-2 h-5 w-5" />
               View Full Documentation
