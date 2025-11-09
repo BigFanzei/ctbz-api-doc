@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "CTBZ API Documentation",
   "scripts": {
-    "build": "node merge-specs.js && node build-html.js"
+    "build": "node merge-specs.js"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
