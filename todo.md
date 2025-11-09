@@ -87,3 +87,12 @@ Create an interactive API documentation website from OpenAPI YAML specifications
 - [ ] Test all routes including /docs and hash routes
 - [ ] Push fix to GitHub
 - [ ] Verify all pages accessible
+
+
+## Bug Report: Hash routing /#/docs still showing homepage
+- [x] Test /#/docs URL on GitHub Pages
+- [x] Check if hash routing is actually working - WORKING!
+- [x] Verify Swagger UI loads on docs page - LOADS BUT YAML 404
+- [x] Fix openapi.yaml URL to use absolute path
+- [ ] Push fix and test
+- [ ] Ensure all module navigation links work
