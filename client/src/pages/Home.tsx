@@ -132,7 +132,7 @@ export default function Home() {
             <Book className="h-8 w-8 text-blue-500" />
             <h1 className="text-2xl font-bold text-white">API Documentation</h1>
           </div>
-          <Link href="/#/docs">
+          <Link href="/docs">
             <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
               View All Documentation
             </Button>
@@ -150,13 +150,13 @@ export default function Home() {
             Comprehensive documentation for all API endpoints, including customers, transfers, wallets, cards, and more.
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/#/docs">
+            <Link href="/docs">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8">
                 <Book className="mr-2 h-5 w-5" />
                 Browse All APIs
               </Button>
             </Link>
-            <a href="/openapi.yaml" download>
+            <a href="/ctbz-api-doc/openapi.yaml" download>
               <Button size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800 text-lg px-8">
                 <FileText className="mr-2 h-5 w-5" />
                 Download OpenAPI Spec
@@ -330,7 +330,7 @@ export default function Home() {
           <p className="text-slate-300 mb-8">
             Explore our comprehensive API documentation and start building your integration today.
           </p>
-          <Link href="/#/docs">
+          <Link href="/docs">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8">
               <Book className="mr-2 h-5 w-5" />
               View Full Documentation
