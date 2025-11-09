@@ -3,6 +3,17 @@ import 'swagger-ui-react/swagger-ui.css';
 import { openapiSpec } from '../openapi-spec';
 import { useEffect, useState } from 'react';
 
+// 将 camelCase 或 kebab-case 转换为 Title Case（用于匹配 OpenAPI tags）
+function normalizeTagName(tag: string): string {
+  // 将 camelCase 转换为带空格的形式：virtualAccount -> Virtual Account
+  return tag
+    .replace(/([A-Z])/g, ' $1') // 在大写字母前添加空格
+    .trim()
+    .split(/[\s-_]+/) // 按空格、横线、下划线分割
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 // 根据标签过滤OpenAPI规范
 function filterSpecByTag(spec: any, tag: string | null) {
   if (!tag || !spec) {
@@ -16,27 +27,44 @@ function filterSpecByTag(spec: any, tag: string | null) {
     return filteredSpec;
   }
 
-  // 过滤路径：只保留以指定标签开头的路径
+  // 标准化tag名称：将 camelCase 转换为 Title Case
+  const normalizedTag = normalizeTagName(tag);
+
+  // 过滤路径：只保留包含指定 tag 的操作
   const filteredPaths: any = {};
 
-  // 标准化tag名称：支持单复数匹配
-  const normalizedTag = tag.toLowerCase();
-
   Object.keys(filteredSpec.paths).forEach((path) => {
-    // 提取路径的第一段作为标签（例如 /customers/... -> customers）
-    const pathSegments = path.split('/').filter(Boolean);
-    const pathTag = pathSegments[0]?.toLowerCase();
+    const pathItem = filteredSpec.paths[path];
+    const filteredPathItem: any = {};
+    let hasMatchingOperation = false;
 
-    // 支持精确匹配或单复数匹配
-    if (pathTag === normalizedTag ||
-        pathTag === normalizedTag + 's' ||
-        pathTag + 's' === normalizedTag ||
-        pathTag.replace(/s$/, '') === normalizedTag.replace(/s$/, '')) {
-      filteredPaths[path] = filteredSpec.paths[path];
+    // 检查每个 HTTP 方法
+    ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'].forEach((method) => {
+      const operation = pathItem[method];
+      if (operation && operation.tags) {
+        // 检查操作的 tags 数组中是否包含匹配的 tag
+        if (operation.tags.includes(normalizedTag)) {
+          filteredPathItem[method] = operation;
+          hasMatchingOperation = true;
+        }
+      }
+    });
+
+    // 保留 parameters 等路径级别的属性
+    if (hasMatchingOperation) {
+      if (pathItem.parameters) {
+        filteredPathItem.parameters = pathItem.parameters;
+      }
+      filteredPaths[path] = filteredPathItem;
     }
   });
 
   filteredSpec.paths = filteredPaths;
+
+  // 只保留匹配的 tag 定义
+  if (filteredSpec.tags) {
+    filteredSpec.tags = filteredSpec.tags.filter((t: any) => t.name === normalizedTag);
+  }
 
   return filteredSpec;
 }
