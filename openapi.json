@@ -12,6 +12,20 @@
     }
   ],
   "paths": {
+    "/": {
+      "get": {
+        "summary": "API Overview",
+        "description": "Welcome to CTBZ API Documentation",
+        "tags": [
+          "Overview"
+        ],
+        "responses": {
+          "200": {
+            "description": "API Information"
+          }
+        }
+      }
+    },
     "/customers/{customer_id}/batch_settlement_schedules": {
       "post": {
         "summary": "Create a batch settlement schedule",
@@ -7096,6 +7110,10 @@
   },
   "tags": [
     {
+      "name": "Overview",
+      "description": "API Documentation Overview"
+    },
+    {
       "name": "batchSettlement",
       "description": "APIs from batchSettlement.yaml"
     },
@@ -7149,6 +7167,12 @@
     }
   ],
   "x-tagGroups": [
+    {
+      "name": "Getting Started",
+      "tags": [
+        "Overview"
+      ]
+    },
     {
       "name": "API Endpoints",
       "tags": [

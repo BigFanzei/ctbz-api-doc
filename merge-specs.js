@@ -18,7 +18,20 @@ const mergedSpec = {
       description: 'Production'
     }
   ],
-  paths: {},
+  paths: {
+    '/': {
+      get: {
+        summary: 'API Overview',
+        description: 'Welcome to CTBZ API Documentation',
+        tags: ['Overview'],
+        responses: {
+          '200': {
+            description: 'API Information'
+          }
+        }
+      }
+    }
+  },
   components: {
     schemas: {},
     parameters: {},
@@ -98,10 +111,21 @@ tagMap.forEach((tag, tagName) => {
   }
 });
 
-mergedSpec.tags = tagsWithOps;
+// Add an "Overview" tag at position 0 to handle Redoc's off-by-one issue
+const overviewTag = {
+  name: 'Overview',
+  description: 'API Documentation Overview'
+};
+
+// Insert Overview at the beginning
+mergedSpec.tags = [overviewTag, ...tagsWithOps];
 
 // Add x-tagGroups to explicitly control Redoc navigation order
 mergedSpec['x-tagGroups'] = [
+  {
+    name: 'Getting Started',
+    tags: ['Overview']
+  },
   {
     name: 'API Endpoints',
     tags: tagsWithOps.map(t => t.name)
