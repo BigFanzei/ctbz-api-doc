@@ -7147,5 +7147,25 @@
       "name": "webhook",
       "description": "APIs from webhook.yaml"
     }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "API Endpoints",
+      "tags": [
+        "batchSettlement",
+        "card",
+        "customer",
+        "developer",
+        "externalAccount",
+        "fxrate",
+        "kycLink",
+        "liquidationAddress",
+        "prefundedAccount",
+        "transfer",
+        "virtualAccount",
+        "wallet",
+        "webhook"
+      ]
+    }
   ]
 }

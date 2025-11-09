@@ -100,6 +100,14 @@ tagMap.forEach((tag, tagName) => {
 
 mergedSpec.tags = tagsWithOps;
 
+// Add x-tagGroups to explicitly control Redoc navigation order
+mergedSpec['x-tagGroups'] = [
+  {
+    name: 'API Endpoints',
+    tags: tagsWithOps.map(t => t.name)
+  }
+];
+
 fs.writeFileSync(outputJsonFile, JSON.stringify(mergedSpec, null, 2));
 
 console.log('✅ Merged specification written to openapi.json');
