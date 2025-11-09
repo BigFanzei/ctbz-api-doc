@@ -3,7 +3,8 @@ const path = require('path');
 const yaml = require('js-yaml');
 
 const specsDir = path.join(__dirname, 'specs');
-const outputFile = path.join(__dirname, 'openapi.yaml');
+const outputYamlFile = path.join(__dirname, 'openapi.yaml');
+const outputJsonFile = path.join(__dirname, 'openapi.json');
 
 // 读取所有YAML文件
 const files = fs.readdirSync(specsDir).filter(f => f.endsWith('.yaml'));
@@ -97,10 +98,13 @@ files.forEach(file => {
 // 添加tags
 mergedSpec.tags = Array.from(tagSet).map(t => JSON.parse(t));
 
-// 写入合并后的文件
-fs.writeFileSync(outputFile, yaml.dump(mergedSpec, { lineWidth: -1 }));
+// 写入 YAML 和 JSON 格式
+fs.writeFileSync(outputYamlFile, yaml.dump(mergedSpec, { lineWidth: -1 }));
+fs.writeFileSync(outputJsonFile, JSON.stringify(mergedSpec, null, 2));
 
-console.log(`\n✅ Merged specification written to: ${outputFile}`);
+console.log(`\n✅ Merged specification written to:`);
+console.log(`   - ${outputYamlFile}`);
+console.log(`   - ${outputJsonFile}`);
 console.log(`   Total paths: ${Object.keys(mergedSpec.paths).length}`);
 console.log(`   Total schemas: ${Object.keys(mergedSpec.components.schemas).length}`);
 console.log(`   Total tags: ${mergedSpec.tags.length}`);
