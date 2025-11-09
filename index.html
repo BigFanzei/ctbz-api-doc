@@ -22,12 +22,8 @@
     <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
     <script>
         window.onload = function() {
-            // 获取基础路径（用于 GitHub Pages 子目录部署）
-            const basePath = window.location.pathname.replace(/\/[^/]*$/, '');
-            const apiUrl = basePath + '/openapi.yaml';
-
             window.ui = SwaggerUIBundle({
-                url: apiUrl,
+                url: './openapi.yaml',
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [
