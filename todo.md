@@ -94,5 +94,13 @@ Create an interactive API documentation website from OpenAPI YAML specifications
 - [x] Check if hash routing is actually working - WORKING!
 - [x] Verify Swagger UI loads on docs page - LOADS BUT YAML 404
 - [x] Fix openapi.yaml URL to use absolute path
-- [ ] Push fix and test
-- [ ] Ensure all module navigation links work
+- [x] Push fix and test - DEPLOYED
+- [x] Issue persists - needs alternative solution (CORS or spec format issue)
+
+
+## New Feature: Inline OpenAPI Spec Loading
+- [x] Install js-yaml package to parse YAML in JavaScript
+- [x] Create openapi-spec.ts to import and export YAML content
+- [x] Update ApiDocs.tsx to use spec prop instead of url prop
+- [x] Test on local dev server - SUCCESS!
+- [ ] Push to GitHub and verify on GitHub Pages

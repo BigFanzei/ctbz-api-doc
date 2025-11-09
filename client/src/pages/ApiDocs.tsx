@@ -1,11 +1,12 @@
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
+import { openapiSpec } from '../openapi-spec';
 
 export default function ApiDocs() {
   return (
     <div className="api-docs-container min-h-screen bg-background">
       <SwaggerUI
-        url="https://bigfanzei.github.io/ctbz-api-doc/openapi.yaml"
+        spec={openapiSpec}
         deepLinking={true}
         displayOperationId={false}
         defaultModelsExpandDepth={1}
