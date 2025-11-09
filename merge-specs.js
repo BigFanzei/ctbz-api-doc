@@ -23,7 +23,8 @@ const mergedSpec = {
     schemas: {},
     parameters: {},
     securitySchemes: {}
-  }
+  },
+  tags: []
 };
 
 const files = fs.readdirSync(specsDir).filter(f => f.endsWith('.yaml'));
@@ -34,7 +35,31 @@ files.forEach(file => {
   const content = fs.readFileSync(path.join(specsDir, file), 'utf8');
   const spec = yaml.load(content);
 
+  // Get tag name from filename (without .yaml extension)
+  const tagName = file.replace('.yaml', '');
+
+  // Add tag definition
+  mergedSpec.tags.push({
+    name: tagName,
+    description: `APIs from ${file}`
+  });
+
+  // Add tag to all operations in this file's paths
   if (spec.paths) {
+    Object.keys(spec.paths).forEach(pathKey => {
+      const pathItem = spec.paths[pathKey];
+
+      // Add tag to each HTTP method
+      ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'].forEach(method => {
+        if (pathItem[method]) {
+          if (!pathItem[method].tags) {
+            pathItem[method].tags = [];
+          }
+          pathItem[method].tags.push(tagName);
+        }
+      });
+    });
+
     Object.assign(mergedSpec.paths, spec.paths);
   }
 
@@ -56,3 +81,4 @@ fs.writeFileSync(outputJsonFile, JSON.stringify(mergedSpec, null, 2));
 console.log('✅ Merged specification written to openapi.json');
 console.log('   Total paths:', Object.keys(mergedSpec.paths).length);
 console.log('   Total schemas:', Object.keys(mergedSpec.components.schemas).length);
+console.log('   Total tags:', mergedSpec.tags.length);

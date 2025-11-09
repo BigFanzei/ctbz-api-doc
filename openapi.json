@@ -42,7 +42,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "batchSettlement"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/pin": {
@@ -74,7 +77,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/ephemeral_keys": {
@@ -125,7 +131,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/developer/cards/summary": {
@@ -160,7 +169,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}": {
@@ -185,7 +197,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts": {
@@ -218,7 +233,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       },
       "post": {
         "summary": "Provision a card account",
@@ -249,7 +267,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/freeze": {
@@ -285,7 +306,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/unfreeze": {
@@ -322,7 +346,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/create_mobile_wallet_provisioning_request": {
@@ -351,7 +378,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/authorizations": {
@@ -414,7 +444,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/transactions": {
@@ -509,7 +542,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/transactions/{transaction_id}": {
@@ -530,7 +566,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/auth_controls": {
@@ -555,7 +594,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/deposit_addresses": {
@@ -599,7 +641,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/withdrawals": {
@@ -645,7 +690,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       },
       "post": {
         "summary": "Create fund withdrawal request",
@@ -672,7 +720,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/withdrawals/{card_withdrawal_id}": {
@@ -694,7 +745,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers/{customer_id}/card_accounts/{card_account_id}/statements/{period}.pdf": {
@@ -723,7 +777,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "card"
+        ]
       }
     },
     "/customers": {
@@ -768,7 +825,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       },
       "post": {
         "summary": "Create a customer",
@@ -812,7 +872,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       }
     },
     "/customers/{customer_id}": {
@@ -835,7 +898,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       },
       "put": {
         "summary": "Update a single customer",
@@ -873,7 +939,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       },
       "delete": {
         "summary": "Delete a single customer",
@@ -903,7 +972,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       }
     },
     "/customers/{customer_id}/associated_persons": {
@@ -936,7 +1008,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       }
     },
     "/customers/{customer_id}/associated_persons/{associated_person_id}": {
@@ -961,7 +1036,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       },
       "put": {
         "summary": "Update a single associated person",
@@ -994,7 +1072,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       },
       "delete": {
         "summary": "Delete a single associated person",
@@ -1026,7 +1107,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       }
     },
     "/customers/{customer_id}/tos_acceptance_link": {
@@ -1048,7 +1132,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       }
     },
     "/customers/{customer_id}/kyc_link": {
@@ -1071,7 +1158,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       }
     },
     "/customers/{customer_id}/transfers": {
@@ -1149,7 +1239,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       }
     },
     "/customers/{customer_id}/static_templates": {
@@ -1175,7 +1268,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       }
     },
     "/customers/tos_links": {
@@ -1204,7 +1300,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "customer"
+        ]
       }
     },
     "/developer/fees": {
@@ -1222,7 +1321,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "developer"
+        ]
       },
       "post": {
         "summary": "Update the configured fee",
@@ -1241,7 +1343,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "developer"
+        ]
       }
     },
     "/developer/fee_external_account": {
@@ -1259,7 +1364,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "developer"
+        ]
       },
       "post": {
         "summary": "Configure a fee external account",
@@ -1278,7 +1386,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "developer"
+        ]
       }
     },
     "/customers/{customer_id}/external_accounts": {
@@ -1325,7 +1436,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "externalAccount"
+        ]
       },
       "post": {
         "summary": "Create a new external account for a customer",
@@ -1356,7 +1470,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "externalAccount"
+        ]
       }
     },
     "/customers/{customer_id}/external_accounts/{external_account_id}": {
@@ -1381,7 +1498,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "externalAccount"
+        ]
       },
       "put": {
         "summary": "Update an external account",
@@ -1415,7 +1535,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "externalAccount"
+        ]
       },
       "delete": {
         "summary": "Delete a single external account",
@@ -1447,7 +1570,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "externalAccount"
+        ]
       }
     },
     "/customers/{customer_id}/external_accounts/{external_account_id}/reactivate": {
@@ -1472,7 +1598,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "externalAccount"
+        ]
       }
     },
     "/external_accounts": {
@@ -1516,7 +1645,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "externalAccount"
+        ]
       }
     },
     "/exchange_rate": {
@@ -1554,7 +1686,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "fxrate"
+        ]
       }
     },
     "/kyc_links": {
@@ -1604,7 +1739,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "kycLink"
+        ]
       },
       "post": {
         "summary": "Generate a link for an individual or business to perform KYC",
@@ -1630,7 +1768,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "kycLink"
+        ]
       }
     },
     "/kyc_links/{kyc_link_id}": {
@@ -1653,7 +1794,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "kycLink"
+        ]
       }
     },
     "/customers/{customer_id}/liquidation_addresses": {
@@ -1700,7 +1844,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
       },
       "post": {
         "summary": "Create a liquidation address",
@@ -1731,7 +1878,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
       }
     },
     "/liquidation_addresses": {
@@ -1775,7 +1925,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
       }
     },
     "/customers/{customer_id}/liquidation_addresses/{liquidation_address_id}": {
@@ -1800,7 +1953,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
       },
       "put": {
         "summary": "Update a liquidation address",
@@ -1833,7 +1989,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
       }
     },
     "/customers/{customer_id}/liquidation_addresses/{liquidation_address_id}/drains": {
@@ -1877,7 +2036,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
       }
     },
     "/liquidation_address/drains": {
@@ -1927,7 +2089,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
       }
     },
     "/prefunded_accounts": {
@@ -1948,7 +2113,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "prefundedAccount"
+        ]
       }
     },
     "/prefunded_accounts/{prefunded_account_id}": {
@@ -1970,7 +2138,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "prefundedAccount"
+        ]
       }
     },
     "/prefunded_accounts/{prefunded_account_id}/history": {
@@ -2004,7 +2175,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "prefundedAccount"
+        ]
       }
     },
     "/transfers": {
@@ -2092,7 +2266,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "transfer"
+        ]
       },
       "post": {
         "summary": "Create a transfer",
@@ -2118,7 +2295,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "transfer"
+        ]
       }
     },
     "/transfers/{transfer_id}": {
@@ -2140,7 +2320,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "transfer"
+        ]
       },
       "put": {
         "summary": "Update a transfer",
@@ -2171,7 +2354,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "transfer"
+        ]
       },
       "delete": {
         "summary": "Delete a transfer",
@@ -2201,7 +2387,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "transfer"
+        ]
       }
     },
     "/transfers/static_templates": {
@@ -2233,7 +2422,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "transfer"
+        ]
       }
     },
     "/customers/{customer_id}/virtual_accounts": {
@@ -2280,7 +2472,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
       },
       "post": {
         "summary": "Create a VA",
@@ -2311,7 +2506,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
       }
     },
     "/customers/{customer_id}/virtual_accounts/{virtual_account_id}": {
@@ -2336,7 +2534,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
       },
       "put": {
         "summary": "Update a VA",
@@ -2369,7 +2570,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
       }
     },
     "/customers/{customer_id}/virtual_accounts/{virtual_account_id}/deactive": {
@@ -2387,7 +2591,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
       }
     },
     "/customers/{customer_id}/virtual_accounts/{virtual_account_id}/reactive": {
@@ -2405,7 +2612,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
       }
     },
     "/customers/{customer_id}/virtual_accounts/{virtual_account_id}/activities": {
@@ -2462,7 +2672,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
       }
     },
     "/virtual_accounts": {
@@ -2487,7 +2700,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
       }
     },
     "/virtual_accounts/history": {
@@ -2543,7 +2759,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
       }
     },
     "/wallets": {
@@ -2588,7 +2807,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "wallet"
+        ]
       }
     },
     "/wallets/total-balance": {
@@ -2606,7 +2828,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "wallet"
+        ]
       }
     },
     "/wallets/{wallet_id}/history": {
@@ -2673,7 +2898,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "wallet"
+        ]
       }
     },
     "/customers/{customer_id}/wallets": {
@@ -2726,7 +2954,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "wallet"
+        ]
       },
       "post": {
         "summary": "Create a wallet",
@@ -2780,7 +3011,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "wallet"
+        ]
       }
     },
     "/customers/{customer_id}/wallets/{wallet_id}": {
@@ -2833,7 +3067,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "wallet"
+        ]
       }
     },
     "/webhooks": {
@@ -2859,7 +3096,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "webhook"
+        ]
       },
       "post": {
         "summary": "Create a webhook endpoint",
@@ -2885,7 +3125,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "webhook"
+        ]
       },
       "put": {
         "summary": "Update a webhook",
@@ -2911,7 +3154,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "webhook"
+        ]
       }
     },
     "/webhooks/{webhook_id}": {
@@ -2927,7 +3173,10 @@
           "default": {
             "description": "Response"
           }
-        }
+        },
+        "tags": [
+          "webhook"
+        ]
       }
     },
     "/webhooks/{webhook_id}/events": {
@@ -2958,7 +3207,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "webhook"
+        ]
       }
     },
     "/webhooks/{webhook_id}/logs": {
@@ -2992,7 +3244,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "webhook"
+        ]
       }
     },
     "/webhooks/{webhook_id}/send": {
@@ -3025,7 +3280,10 @@
               }
             }
           }
-        }
+        },
+        "tags": [
+          "webhook"
+        ]
       }
     }
   },
@@ -6897,5 +7155,63 @@
         "bearerFormat": "JWT"
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "batchSettlement",
+      "description": "APIs from batchSettlement.yaml"
+    },
+    {
+      "name": "card",
+      "description": "APIs from card.yaml"
+    },
+    {
+      "name": "customer",
+      "description": "APIs from customer.yaml"
+    },
+    {
+      "name": "developer",
+      "description": "APIs from developer.yaml"
+    },
+    {
+      "name": "externalAccount",
+      "description": "APIs from externalAccount.yaml"
+    },
+    {
+      "name": "fxrate",
+      "description": "APIs from fxrate.yaml"
+    },
+    {
+      "name": "kycLink",
+      "description": "APIs from kycLink.yaml"
+    },
+    {
+      "name": "liquidationAddress",
+      "description": "APIs from liquidationAddress.yaml"
+    },
+    {
+      "name": "prefundedAccount",
+      "description": "APIs from prefundedAccount.yaml"
+    },
+    {
+      "name": "transactionStatus",
+      "description": "APIs from transactionStatus.yaml"
+    },
+    {
+      "name": "transfer",
+      "description": "APIs from transfer.yaml"
+    },
+    {
+      "name": "virtualAccount",
+      "description": "APIs from virtualAccount.yaml"
+    },
+    {
+      "name": "wallet",
+      "description": "APIs from wallet.yaml"
+    },
+    {
+      "name": "webhook",
+      "description": "APIs from webhook.yaml"
+    }
+  ]
 }
