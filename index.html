@@ -44,11 +44,9 @@
         }
 
         Redoc.init(
-            './openapi.json?v3=' + Date.now(),
+            './openapi.json?v4=' + Date.now(),
             {
-                scrollYOffset: 68,
-                disableSearch: false,
-                hideLoading: false
+                scrollYOffset: 68
             },
             document.getElementById('redoc-container')
         );

@@ -24,7 +24,8 @@ const mergedSpec = {
     parameters: {},
     securitySchemes: {}
   },
-  tags: []
+  tags: [],
+  'x-tagGroups': []
 };
 
 const files = fs.readdirSync(specsDir).filter(f => f.endsWith('.yaml')).sort();
@@ -48,18 +49,20 @@ files.forEach(file => {
   // Add tag to all operations in this file's paths
   if (spec.paths) {
     Object.keys(spec.paths).forEach(pathKey => {
-      const pathItem = spec.paths[pathKey];
+      // Clone the path item to avoid mutations
+      const pathItem = JSON.parse(JSON.stringify(spec.paths[pathKey]));
 
       // Replace tags with filename-based tag for each HTTP method
       ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'].forEach(method => {
         if (pathItem[method]) {
-          // Replace existing tags with only our filename-based tag
+          // Completely replace tags array with only our filename-based tag
+          delete pathItem[method].tags;
           pathItem[method].tags = [tagName];
         }
       });
-    });
 
-    Object.assign(mergedSpec.paths, spec.paths);
+      mergedSpec.paths[pathKey] = pathItem;
+    });
   }
 
   if (spec.components) {
