@@ -12,9 +12,10 @@ function Router() {
   return (
     <WouterRouter hook={useHashLocation}>
       <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/docs" component={ApiDocs} />
-        <Route path="/404" component={NotFound} />
+        <Route path={"/"} component={Home} />
+        <Route path={"/docs"} component={ApiDocs} />
+        <Route path={"/docs/:section"} component={ApiDocs} />
+        <Route path={"/404"} component={NotFound} />
         {/* Final fallback route */}
         <Route component={NotFound} />
       </Switch>
