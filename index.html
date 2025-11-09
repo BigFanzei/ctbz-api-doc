@@ -22,10 +22,7231 @@
     <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
     <script>
         window.onload = function() {
-            // 添加时间戳防止缓存
-            const timestamp = new Date().getTime();
+            const spec = {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "CTBZ API Documentation",
+    "version": "1.0.0",
+    "description": "完整的API文档，包含所有端点和模型定义"
+  },
+  "servers": [
+    {
+      "url": "https://api.example.com",
+      "description": "Production"
+    },
+    {
+      "url": "https://sandbox.api.example.com",
+      "description": "Sandbox"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/customers/{customer_id}/batch_settlement_schedules": {
+      "post": {
+        "summary": "Create a batch settlement schedule",
+        "description": "为指定客户创建批量清算计划",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchSettlementScheduleCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchSettlementSchedule"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "batchSettlement"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/pin": {
+      "post": {
+        "summary": "Create card PIN change URL",
+        "description": "生成一次性 PIN 修改 URL，可嵌入 iframe，单次有效",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/ephemeral_keys": {
+      "post": {
+        "summary": "Generate key to reveal card details",
+        "description": "生成临时传输密钥保护卡面信息传输（5 分钟轮换）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "client_nonce"
+                ],
+                "properties": {
+                  "client_nonce": {
+                    "type": "string",
+                    "description": "客户端随机数，需与客户后端私钥配合使用"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "description": "传输密钥（5 分钟轮换）"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/developer/cards/summary": {
+      "get": {
+        "summary": "Get summary of card program",
+        "description": "获取机构下卡计划汇总指标",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SummaryPeriod"
+            }
+          },
+          {
+            "name": "period_key",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "年=YYYY；月=YYYYMM；周=YYYYMMWW"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeveloperCardsSummary"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}": {
+      "get": {
+        "summary": "Get a card account",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts": {
+      "get": {
+        "summary": "Get all card accounts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CardAccount"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      },
+      "post": {
+        "summary": "Provision a card account",
+        "description": "虚拟卡开卡（每个客户 1 张虚拟卡）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardProvisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/freeze": {
+      "post": {
+        "summary": "Freeze a card account",
+        "description": "冻结卡账户",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardFreezeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardFreezeRecord"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/unfreeze": {
+      "post": {
+        "summary": "Unfreeze a card account",
+        "description": "解除卡账户冻结",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "initiator"
+                ],
+                "properties": {
+                  "initiator": {
+                    "$ref": "#/components/schemas/FreezeInitiator"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/create_mobile_wallet_provisioning_request": {
+      "post": {
+        "summary": "Create a mobile wallet push provisioning request",
+        "description": "将卡推送至 Apple Pay 或 Google Pay",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MobileWalletProvisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/authorizations": {
+      "get": {
+        "summary": "Get pending card authorizations",
+        "description": "查询进行中的授权交易",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 200,
+              "default": 100
+            }
+          },
+          {
+            "name": "starting_time",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "ending_time",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CardAuthorization"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/transactions": {
+      "get": {
+        "summary": "Get card transactions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 200,
+              "default": 100
+            }
+          },
+          {
+            "name": "starting_time",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "ending_time",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 200,
+              "default": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "posted"
+              ]
+            }
+          },
+          {
+            "name": "pagination_token",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category_family",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/CategoryFamily"
+            },
+            "description": "顶层类别过滤"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardTransactionList"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/transactions/{transaction_id}": {
+      "get": {
+        "summary": "Get a card transaction",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/auth_controls": {
+      "get": {
+        "summary": "Get authorization controls",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthControls"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/deposit_addresses": {
+      "post": {
+        "summary": "Provision an additional top-up deposit address for the card account",
+        "description": "申请额外的链上充值通道；返回的地址显示在 additional_funding_instruction",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chain"
+                ],
+                "properties": {
+                  "chain": {
+                    "$ref": "#/components/schemas/Chain"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepositAddress"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/withdrawals": {
+      "get": {
+        "summary": "Get withdrawal history of funds",
+        "description": "查询提现历史",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CardWithdrawal"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      },
+      "post": {
+        "summary": "Create fund withdrawal request",
+        "description": "创建提现请求",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCardWithdrawalRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/withdrawals/{card_withdrawal_id}": {
+      "get": {
+        "summary": "Get a card withdrawal",
+        "description": "获取单笔提现记录",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          },
+          {
+            "$ref": "#/components/parameters/CardWithdrawalId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers/{customer_id}/card_accounts/{card_account_id}/statements/{period}.pdf": {
+      "post": {
+        "summary": "Generate a card account statement (PDF)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/CardAccountId"
+          },
+          {
+            "$ref": "#/components/parameters/StatementPeriod"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "PDF",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "card"
+        ]
+      }
+    },
+    "/customers": {
+      "get": {
+        "summary": "Get all customers",
+        "description": "分页获取客户列表",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "description": "返回的数据集长度"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Customer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      },
+      "post": {
+        "summary": "Create a customer",
+        "description": "创建个人或企业客户",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "description": "幂等键",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CustomerCreateIndividual"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CustomerCreateBusiness"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/customers/{customer_id}": {
+      "get": {
+        "summary": "Get a single customer",
+        "description": "获取单个客户对象",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      },
+      "put": {
+        "summary": "Update a single customer",
+        "description": "使用 PUT 更新客户信息；体结构与创建时一致（区分个人/企业）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CustomerCreateIndividual"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CustomerCreateBusiness"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a single customer",
+        "description": "删除单个客户对象",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/customers/{customer_id}/associated_persons": {
+      "post": {
+        "summary": "Create an associated person",
+        "description": "为客户新增关联人员（UBO/董事/签字人等）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssociatedPersonCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociatedPerson"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/customers/{customer_id}/associated_persons/{associated_person_id}": {
+      "get": {
+        "summary": "Get a single associated person",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/AssociatedPersonId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociatedPerson"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      },
+      "put": {
+        "summary": "Update a single associated person",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/AssociatedPersonId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssociatedPersonUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociatedPerson"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a single associated person",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/AssociatedPersonId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/customers/{customer_id}/tos_acceptance_link": {
+      "get": {
+        "summary": "Get URL for ToS acceptance for a customer",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/customers/{customer_id}/kyc_link": {
+      "get": {
+        "summary": "Get a KYC link for a customer",
+        "description": "返回用于触发个人/企业 KYC 的托管链接",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/customers/{customer_id}/transfers": {
+      "get": {
+        "summary": "Get all transfers for a customer",
+        "description": "按条件筛选并返回客户的所有转账记录",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          },
+          {
+            "name": "tx_hash",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updated_after_ms",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "updated_before_ms",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "交易状态过滤",
+            "schema": {
+              "$ref": "#/components/schemas/TransferState"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transfer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/customers/{customer_id}/static_templates": {
+      "get": {
+        "summary": "Get all templates for a customer",
+        "description": "获取该客户下的转账模板集合",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransferTemplate"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/customers/tos_links": {
+      "post": {
+        "summary": "Request a hosted URL for ToS acceptance (new customer)",
+        "description": "用于新客户创建流程，获取托管的 ToS 签约链接",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "customer"
+        ]
+      }
+    },
+    "/developer/fees": {
+      "get": {
+        "summary": "Get configured fee",
+        "description": "获取当前组织下对所有客户生效的清算地址费率（BPS），在组织账户层面配置。 字段为字符串表示的小数，例如 \"0.5\"。\n",
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeeConfig"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "developer"
+        ]
+      },
+      "post": {
+        "summary": "Update the configured fee",
+        "description": "更新组织层面的清算地址费率（BPS），字符串小数表示",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeeConfig"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "developer"
+        ]
+      }
+    },
+    "/developer/fee_external_account": {
+      "get": {
+        "summary": "Get the configured fee external account",
+        "description": "获取用于费用结算/分润的外部收款账户配置",
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeeExternalAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "developer"
+        ]
+      },
+      "post": {
+        "summary": "Configure a fee external account",
+        "description": "配置或更新用于费用结算/分润的外部收款账户",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeeExternalAccount"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "developer"
+        ]
+      }
+    },
+    "/customers/{customer_id}/external_accounts": {
+      "get": {
+        "summary": "Get all external accounts for a customer",
+        "description": "返回该客户名下的所有外部账户，支持分页",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExternalAccount"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "externalAccount"
+        ]
+      },
+      "post": {
+        "summary": "Create a new external account for a customer",
+        "description": "为客户新增外部账户",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalAccountCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "externalAccount"
+        ]
+      }
+    },
+    "/customers/{customer_id}/external_accounts/{external_account_id}": {
+      "get": {
+        "summary": "Retrieve an external account",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/ExternalAccountId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "externalAccount"
+        ]
+      },
+      "put": {
+        "summary": "Update an external account",
+        "description": "仅更新指定字段（如地址、账户路由信息等）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/ExternalAccountId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalAccountUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "externalAccount"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a single external account",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/ExternalAccountId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "externalAccount"
+        ]
+      }
+    },
+    "/customers/{customer_id}/external_accounts/{external_account_id}/reactivate": {
+      "post": {
+        "summary": "Reactivate an external account",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/ExternalAccountId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "externalAccount"
+        ]
+      }
+    },
+    "/external_accounts": {
+      "get": {
+        "summary": "Get all external accounts (all)",
+        "description": "平台维度列出所有外部账户，支持分页",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExternalAccount"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "externalAccount"
+        ]
+      }
+    },
+    "/exchange_rate": {
+      "get": {
+        "summary": "Get FX rate",
+        "description": "查询两种货币之间的中间价、买入价与卖出价",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CurrencyCode"
+            },
+            "description": "源币种"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CurrencyCode"
+            },
+            "description": "目标币种"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeRate"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "fxrate"
+        ]
+      }
+    },
+    "/kyc_links": {
+      "get": {
+        "summary": "Get all KYC links",
+        "description": "按条件筛选并分页返回 KYC 链接",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerIdQuery"
+          },
+          {
+            "$ref": "#/components/parameters/Email"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          },
+          {
+            "$ref": "#/components/parameters/Limit10to100"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/KycLink"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "kycLink"
+        ]
+      },
+      "post": {
+        "summary": "Generate a link for an individual or business to perform KYC",
+        "description": "为个人或企业生成执行 KYC 的链接",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KycLinkCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KycLink"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "kycLink"
+        ]
+      }
+    },
+    "/kyc_links/{kyc_link_id}": {
+      "get": {
+        "summary": "Check status of a KYC link",
+        "description": "获取单个 KYC 链接的详细信息与状态",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/KycLinkId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KycLink"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "kycLink"
+        ]
+      }
+    },
+    "/customers/{customer_id}/liquidation_addresses": {
+      "get": {
+        "summary": "Get all liquidation addresses for a customer",
+        "description": "返回指定客户名下的所有清算地址（支持分页）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LiquidationAddress"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
+      },
+      "post": {
+        "summary": "Create a liquidation address",
+        "description": "为客户创建新的清算地址",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LiquidationAddressCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiquidationAddress"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
+      }
+    },
+    "/liquidation_addresses": {
+      "get": {
+        "summary": "Get all liquidation addresses (all customers)",
+        "description": "平台维度列出全部清算地址（支持分页）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LiquidationAddress"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
+      }
+    },
+    "/customers/{customer_id}/liquidation_addresses/{liquidation_address_id}": {
+      "get": {
+        "summary": "Get a liquidation address",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/LiquidationAddressId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiquidationAddress"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
+      },
+      "put": {
+        "summary": "Update a liquidation address",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/LiquidationAddressId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LiquidationAddressUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiquidationAddress"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
+      }
+    },
+    "/customers/{customer_id}/liquidation_addresses/{liquidation_address_id}/drains": {
+      "get": {
+        "summary": "Get drain history of a liquidation address",
+        "description": "追踪链上清算地址的资金流（Drains）与状态变更",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/LiquidationAddressId"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedAfterMs"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedBeforeMs"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LiquidationDrain"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
+      }
+    },
+    "/liquidation_address/drains": {
+      "get": {
+        "summary": "Liquidation address activity across all customers",
+        "description": "获取当前机构下所有客户清算地址的资金流水（Drains）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedAfterMs"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedBeforeMs"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LiquidationDrain"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "liquidationAddress"
+        ]
+      }
+    },
+    "/prefunded_accounts": {
+      "get": {
+        "summary": "Get a list of all prefunded accounts",
+        "description": "返回平台下所有预充值账户信息",
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PrefundedAccount"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "prefundedAccount"
+        ]
+      }
+    },
+    "/prefunded_accounts/{prefunded_account_id}": {
+      "get": {
+        "summary": "Get details for a specific prefunded account",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PrefundedAccountId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrefundedAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "prefundedAccount"
+        ]
+      }
+    },
+    "/prefunded_accounts/{prefunded_account_id}/history": {
+      "get": {
+        "summary": "Get funding history of a prefunded account",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PrefundedAccountId"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PrefundedAccountHistory"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "prefundedAccount"
+        ]
+      }
+    },
+    "/transfers": {
+      "get": {
+        "summary": "Get all transfers",
+        "description": "平台维度，按条件筛选并返回所有转账记录",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          },
+          {
+            "name": "tx_hash",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "匹配链上交易哈希"
+          },
+          {
+            "name": "updated_after_ms",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "返回该毫秒时间戳（含）之后更新的交易"
+          },
+          {
+            "name": "updated_before_ms",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "返回该毫秒时间戳（含）之前更新的交易"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "交易状态过滤",
+            "schema": {
+              "$ref": "#/components/schemas/TransferState"
+            }
+          },
+          {
+            "name": "template_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "指定模板 ID，返回匹配该模板的转账"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "description": "结果集大小"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transfer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "transfer"
+        ]
+      },
+      "post": {
+        "summary": "Create a transfer",
+        "description": "创建一笔转账",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transfer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
+    "/transfers/{transfer_id}": {
+      "get": {
+        "summary": "Get a transfer",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TransferId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transfer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "transfer"
+        ]
+      },
+      "put": {
+        "summary": "Update a transfer",
+        "description": "仅允许在状态为 `awaiting_funds` 的交易上更新金额/费用等字段",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TransferId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transfer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "transfer"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a transfer",
+        "description": "仅允许在状态为 `awaiting_funds` 的交易上执行删除",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TransferId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
+    "/transfers/static_templates": {
+      "get": {
+        "summary": "Get all static templates",
+        "description": "返回可用于转账的静态模板列表",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransferTemplate"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "transfer"
+        ]
+      }
+    },
+    "/customers/{customer_id}/virtual_accounts": {
+      "get": {
+        "summary": "List VA by customer",
+        "description": "获取指定客户名下的所有虚拟账户（VA）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VirtualAccount"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
+      },
+      "post": {
+        "summary": "Create a VA",
+        "description": "为客户创建一个新的虚拟账户（VA）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VirtualAccountCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VirtualAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
+      }
+    },
+    "/customers/{customer_id}/virtual_accounts/{virtual_account_id}": {
+      "get": {
+        "summary": "Get a VA",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/VirtualAccountId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VirtualAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
+      },
+      "put": {
+        "summary": "Update a VA",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/VirtualAccountId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VirtualAccountUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VirtualAccount"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
+      }
+    },
+    "/customers/{customer_id}/virtual_accounts/{virtual_account_id}/deactive": {
+      "post": {
+        "summary": "Deactivate a VA",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/VirtualAccountId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
+      }
+    },
+    "/customers/{customer_id}/virtual_accounts/{virtual_account_id}/reactive": {
+      "post": {
+        "summary": "Reactivate a VA",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/VirtualAccountId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
+      }
+    },
+    "/customers/{customer_id}/virtual_accounts/{virtual_account_id}/activities": {
+      "get": {
+        "summary": "VA activities",
+        "description": "查询单一 VA 的交易事件与资金变动记录",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerId"
+          },
+          {
+            "$ref": "#/components/parameters/VirtualAccountId"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          },
+          {
+            "$ref": "#/components/parameters/EventType"
+          },
+          {
+            "name": "tx_hash",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "可选，根据链上交易哈希筛选"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VAActivity"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
+      }
+    },
+    "/virtual_accounts": {
+      "get": {
+        "summary": "List VA (all customers)",
+        "description": "获取开发者下所有客户的虚拟账户列表",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Status"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
+      }
+    },
+    "/virtual_accounts/history": {
+      "get": {
+        "summary": "VA activities across all customers",
+        "description": "获取开发者下所有客户的 VA 事件与活动历史",
+        "parameters": [
+          {
+            "name": "tx_hash",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          },
+          {
+            "$ref": "#/components/parameters/EventType"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedAfterMs"
+          },
+          {
+            "$ref": "#/components/parameters/UpdatedBeforeMs"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VAActivity"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "virtualAccount"
+        ]
+      }
+    },
+    "/wallets": {
+      "get": {
+        "summary": "Get wallets",
+        "description": "分页返回钱包列表。",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "description": "返回数据集的长度"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Wallet"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "wallet"
+        ]
+      }
+    },
+    "/wallets/total-balance": {
+      "get": {
+        "summary": "Get total balance of all wallets",
+        "description": "返回当前账户名下所有钱包的汇总余额。",
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TotalBalance"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "wallet"
+        ]
+      }
+    },
+    "/wallets/{wallet_id}/history": {
+      "get": {
+        "summary": "Get transaction history of a wallet",
+        "description": "查询指定钱包的交易历史。",
+        "parameters": [
+          {
+            "name": "wallet_id",
+            "in": "path",
+            "required": true,
+            "description": "钱包 UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "name": "update_after_ms",
+            "in": "query",
+            "description": "返回该毫秒时间戳（含）之后更新的交易（Unix ms）",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "update_before_ms",
+            "in": "query",
+            "description": "返回该毫秒时间戳（含）之前更新的交易（Unix ms）",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "description": "返回数据集大小"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transaction"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "wallet"
+        ]
+      }
+    },
+    "/customers/{customer_id}/wallets": {
+      "get": {
+        "summary": "Get all wallets for a customer",
+        "description": "返回某客户的全部钱包列表（分页）。",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/StartingAfter"
+          },
+          {
+            "$ref": "#/components/parameters/EndingBefore"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "data"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Wallet"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "wallet"
+        ]
+      },
+      "post": {
+        "summary": "Create a wallet",
+        "description": "为指定客户新建钱包（幂等）。",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "description": "幂等键，避免重复创建",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chain"
+                ],
+                "properties": {
+                  "chain": {
+                    "$ref": "#/components/schemas/Chain"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Wallet"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "wallet"
+        ]
+      }
+    },
+    "/customers/{customer_id}/wallets/{wallet_id}": {
+      "get": {
+        "summary": "Get a wallet",
+        "description": "查询某客户的单个钱包及其余额列表。",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "wallet_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Wallet"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "balances": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/BalanceItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "wallet"
+        ]
+      }
+    },
+    "/webhooks": {
+      "get": {
+        "summary": "Get all webhook endpoints (active & inactive)",
+        "description": "返回当前组织下的全部 Webhook 端点（含 active/disabled/deleted）",
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/WebhookEndpoint"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "webhook"
+        ]
+      },
+      "post": {
+        "summary": "Create a webhook endpoint",
+        "description": "创建新的 Webhook 端点",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookEndpoint"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "webhook"
+        ]
+      },
+      "put": {
+        "summary": "Update a webhook",
+        "description": "更新已有 Webhook 端点；按请求体中的 id 指定目标端点",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookEndpoint"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "webhook"
+        ]
+      }
+    },
+    "/webhooks/{webhook_id}": {
+      "delete": {
+        "summary": "Delete a webhook",
+        "description": "删除指定的 Webhook 端点",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WebhookId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response"
+          }
+        },
+        "tags": [
+          "webhook"
+        ]
+      }
+    },
+    "/webhooks/{webhook_id}/events": {
+      "get": {
+        "summary": "List upcoming events",
+        "description": "列出该 Webhook 即将接收的下一批事件（最多 10 条）",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WebhookId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/WebhookEventPreview"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "webhook"
+        ]
+      }
+    },
+    "/webhooks/{webhook_id}/logs": {
+      "get": {
+        "summary": "View logs",
+        "description": "查看该 Webhook 的最近投递日志",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WebhookId"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/WebhookDeliveryLog"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "webhook"
+        ]
+      }
+    },
+    "/webhooks/{webhook_id}/send": {
+      "post": {
+        "summary": "Send event (echo test)",
+        "description": "触发一次回环测试，将指定 event_id 的事件回放至该 Webhook",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WebhookId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEchoSendRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookEchoSendResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "webhook"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CurrencyCode": {
+        "type": "string",
+        "description": "计价币种（法币或加密）",
+        "enum": [
+          "usd",
+          "usdc",
+          "usdt"
+        ]
+      },
+      "PaymentRail": {
+        "type": "string",
+        "enum": [
+          "arbitrum",
+          "avalanche_c_chain",
+          "base",
+          "ethereum",
+          "optimism",
+          "polygon",
+          "solana",
+          "spei",
+          "stellar",
+          "Alipay",
+          "WeChat",
+          "Creditcard"
+        ],
+        "description": "支付/链路类型"
+      },
+      "DestinationRef": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "payment_rails": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "external_account_id": {
+            "type": "string",
+            "description": "外部银行账户 ID（对应 external_account 对象）"
+          },
+          "evonet_wallet_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "内部钱包 ID"
+          },
+          "trace_number": {
+            "type": "string"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "deposit_id": {
+            "type": "string",
+            "description": "对应的入金事件 ID"
+          },
+          "blockchain_memo": {
+            "type": "string"
+          }
+        }
+      },
+      "BatchSettlementScheduleCreate": {
+        "type": "object",
+        "required": [
+          "destination"
+        ],
+        "properties": {
+          "destination": {
+            "$ref": "#/components/schemas/DestinationRef"
+          }
+        }
+      },
+      "BatchSettlementSchedule": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "成功创建的清算计划 ID（可在平台展示）"
+          }
+        }
+      },
+      "CardStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "pending",
+          "inactive",
+          "frozen"
+        ]
+      },
+      "FreezeInitiator": {
+        "type": "string",
+        "enum": [
+          "developer",
+          "customer"
+        ]
+      },
+      "FreezeReason": {
+        "type": "string",
+        "enum": [
+          "lost_or_stolen",
+          "suspicious_activity",
+          "planned_inactivity",
+          "suspected_fraud",
+          "other"
+        ]
+      },
+      "Chain": {
+        "type": "string",
+        "enum": [
+          "base",
+          "solana"
+        ],
+        "description": "钱包所在链"
+      },
+      "SummaryPeriod": {
+        "type": "string",
+        "enum": [
+          "year",
+          "month",
+          "week",
+          "day",
+          "lifetime"
+        ]
+      },
+      "CategoryFamily": {
+        "type": "string",
+        "enum": [
+          "cards",
+          "crypto",
+          "QR"
+        ]
+      },
+      "DeveloperCardsSummary": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "$ref": "#/components/schemas/SummaryPeriod"
+          },
+          "period_starting": {
+            "type": "string",
+            "description": "期间起始（ISO 日期或 YYYY/WW 口径）"
+          },
+          "card_provisioned_count": {
+            "type": "integer",
+            "description": "期间内开卡数量"
+          },
+          "card_transactions_count": {
+            "type": "integer"
+          },
+          "provisioned_card_by_country": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "各国家/地区开卡数量分布"
+          },
+          "transaction_volume": {
+            "type": "string"
+          },
+          "transacting_card_acconts_count": {
+            "type": "string"
+          },
+          "card_transactions_count_by_country": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "transaction_volume_by_country": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "transacting_cards_by_country": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "Money": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          }
+        }
+      },
+      "BalanceBreakdown": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "hold": {
+            "$ref": "#/components/schemas/Money"
+          }
+        }
+      },
+      "CardholderName": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string"
+          },
+          "middle_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          }
+        }
+      },
+      "CardDetails": {
+        "type": "object",
+        "description": "卡信息（视合规遮蔽，通常只存 token/指纹）",
+        "additionalProperties": true
+      },
+      "CryptoAccount": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "标准自托管或 evonet-wallet",
+            "enum": [
+              "standard",
+              "evonet-wallet"
+            ]
+          },
+          "address": {
+            "type": "string"
+          }
+        }
+      },
+      "FundingInstruction": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "address": {
+            "type": "string",
+            "description": "EVONET 提供的充值地址"
+          },
+          "memo": {
+            "type": "string",
+            "description": "如链要求 Memo/Tag，充值时必须携带"
+          }
+        }
+      },
+      "FreezeWindow": {
+        "type": "object",
+        "properties": {
+          "initiator": {
+            "$ref": "#/components/schemas/FreezeInitiator"
+          },
+          "card_account_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/FreezeReason"
+          },
+          "reason_detail": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "starting_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ending_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CardAccount": {
+        "type": "object",
+        "required": [
+          "id",
+          "customer_id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "card account UUID"
+          },
+          "customer_id": {
+            "type": "string"
+          },
+          "card_image_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CardStatus"
+          },
+          "status_reason": {
+            "type": "string"
+          },
+          "balance": {
+            "$ref": "#/components/schemas/BalanceBreakdown"
+          },
+          "freezes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FreezeWindow"
+            }
+          },
+          "client_reference_id": {
+            "type": "string"
+          },
+          "cardholder_name": {
+            "$ref": "#/components/schemas/CardholderName"
+          },
+          "card_details": {
+            "$ref": "#/components/schemas/CardDetails"
+          },
+          "crypto_account": {
+            "$ref": "#/components/schemas/CryptoAccount"
+          },
+          "funding_instruction": {
+            "$ref": "#/components/schemas/FundingInstruction"
+          },
+          "additional_funding_instruction": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FundingInstruction"
+            }
+          }
+        }
+      },
+      "CardProvisionRequest": {
+        "type": "object",
+        "required": [
+          "currency",
+          "chain"
+        ],
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode",
+            "description": "虚拟卡支持的加密货币"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "client_reference_id": {
+            "type": "string"
+          },
+          "crypto_account": {
+            "$ref": "#/components/schemas/CryptoAccount"
+          }
+        }
+      },
+      "CardFreezeRequest": {
+        "type": "object",
+        "required": [
+          "initiator",
+          "reason"
+        ],
+        "properties": {
+          "initiator": {
+            "$ref": "#/components/schemas/FreezeInitiator"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/FreezeReason"
+          },
+          "reason_detail": {
+            "type": "string"
+          },
+          "starting_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ending_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CardFreezeRecord": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/CardStatus"
+          },
+          "card_account_id": {
+            "type": "string"
+          },
+          "initiator": {
+            "$ref": "#/components/schemas/FreezeInitiator"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/FreezeReason"
+          },
+          "reason_detail": {
+            "type": "string"
+          },
+          "starting_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ending_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WalletProvider": {
+        "type": "string",
+        "enum": [
+          "apple_pay",
+          "google_pay"
+        ]
+      },
+      "MobileWalletProvisionRequest": {
+        "type": "object",
+        "required": [
+          "wallet_provider"
+        ],
+        "properties": {
+          "wallet_provider": {
+            "$ref": "#/components/schemas/WalletProvider"
+          },
+          "apple_pay": {
+            "type": "object",
+            "properties": {
+              "leaf_cert": {
+                "type": "string"
+              },
+              "subordinate_cert": {
+                "type": "string"
+              },
+              "nonce": {
+                "type": "string"
+              },
+              "nonce_signature": {
+                "type": "string"
+              },
+              "encoding": {
+                "type": "string"
+              }
+            }
+          },
+          "google_pay": {
+            "type": "object",
+            "properties": {
+              "client_wallet_account_id": {
+                "type": "string"
+              },
+              "client_device_id": {
+                "type": "string"
+              },
+              "scheme": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "VerificationData": {
+        "type": "object",
+        "properties": {
+          "avs": {
+            "type": "string"
+          },
+          "cvv": {
+            "type": "string"
+          },
+          "_3ds": {
+            "type": "string"
+          }
+        }
+      },
+      "LocalTransactionDetail": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "exchange_rate": {
+            "type": "string"
+          }
+        }
+      },
+      "CardAuthorization": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "mcc": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "authorized_at": {
+            "type": "string"
+          },
+          "billing_amount": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "properties": {
+              "vendor_auth_id": {
+                "type": "string",
+                "description": "外部系统订单号（用于对账）"
+              }
+            }
+          },
+          "local_transaction_details": {
+            "$ref": "#/components/schemas/LocalTransactionDetail"
+          },
+          "verification_data": {
+            "$ref": "#/components/schemas/VerificationData"
+          }
+        }
+      },
+      "TransactionCategory": {
+        "type": "string",
+        "enum": [
+          "adjustment",
+          "fee",
+          "purchase",
+          "refund",
+          "crypto_funding",
+          "crypto_return",
+          "crypto_withdrawal"
+        ]
+      },
+      "CardTransaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/TransactionCategory"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "description": {
+            "type": "string"
+          },
+          "posted_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "card_account_id": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string"
+          },
+          "billing_amount": {
+            "type": "string"
+          },
+          "mcc": {
+            "type": "string"
+          },
+          "merchant_name": {
+            "type": "string"
+          },
+          "merchant_location": {
+            "type": "string"
+          },
+          "local_transaction_detail": {
+            "$ref": "#/components/schemas/LocalTransactionDetail"
+          },
+          "authorized_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CardTransactionList": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "total_page": {
+            "type": "integer"
+          },
+          "total_count": {
+            "type": "integer"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CardTransaction"
+            }
+          },
+          "pagination_token": {
+            "type": "string"
+          }
+        }
+      },
+      "SpendingLimit": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "trial_lifetime"
+            ]
+          },
+          "total_amount": {
+            "type": "string",
+            "description": "spending_limit.total_amount"
+          },
+          "remaining_amount": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "next_reset_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          }
+        }
+      },
+      "AuthControls": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string"
+          },
+          "card_account_id": {
+            "type": "string"
+          },
+          "spending_limit": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpendingLimit"
+            }
+          }
+        }
+      },
+      "DepositAddress": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "address": {
+            "type": "string",
+            "description": "新分配的充值地址"
+          },
+          "memo": {
+            "type": "string",
+            "description": "若返回，链上充值必须携带"
+          }
+        }
+      },
+      "GasFee": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          }
+        }
+      },
+      "WithdrawalDestination": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "address": {
+            "type": "string"
+          },
+          "memo": {
+            "type": "string"
+          },
+          "tx_hash": {
+            "type": "string"
+          },
+          "gas_fee": {
+            "$ref": "#/components/schemas/GasFee"
+          }
+        }
+      },
+      "CardWithdrawalType": {
+        "type": "string",
+        "enum": [
+          "top_up_balance_withdrawal",
+          "fee"
+        ]
+      },
+      "CardWithdrawal": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/WithdrawalDestination"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "$ref": "#/components/schemas/CardWithdrawalType"
+          },
+          "client_note": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateCardWithdrawalRequest": {
+        "type": "object",
+        "required": [
+          "id",
+          "amount",
+          "currency",
+          "destination",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "destination": {
+            "type": "object",
+            "properties": {
+              "chain": {
+                "$ref": "#/components/schemas/Chain"
+              },
+              "address": {
+                "type": "string"
+              },
+              "memo": {
+                "type": "string"
+              },
+              "gas_fee": {
+                "type": "string"
+              }
+            }
+          },
+          "type": {
+            "$ref": "#/components/schemas/CardWithdrawalType"
+          },
+          "client_note": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomerStatus": {
+        "type": "string",
+        "description": "客户状态",
+        "enum": [
+          "active",
+          "awaiting_questions",
+          "awaiting_ubo",
+          "incomplete",
+          "not_started",
+          "offboarded",
+          "paused",
+          "rejected",
+          "under_review"
+        ]
+      },
+      "CapabilityState": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "active",
+          "inactive",
+          "rejected"
+        ]
+      },
+      "AccountPurposeIndividual": {
+        "type": "string",
+        "enum": [
+          "charitable_donations",
+          "ecommerce_retail_payments",
+          "investment_purposes",
+          "operating_a_company",
+          "other",
+          "payments_to_friends_or_family_abroad",
+          "personal_or_living_expenses",
+          "protect_wealth",
+          "purchase_goods_and_services",
+          "receive_payment_for_freelancing",
+          "receive_salary"
+        ]
+      },
+      "EmploymentStatus": {
+        "type": "string",
+        "enum": [
+          "employed",
+          "homemaker",
+          "retired",
+          "self_employed",
+          "student",
+          "unemployed"
+        ]
+      },
+      "SourceOfFundIndividual": {
+        "type": "string",
+        "enum": [
+          "company_funds",
+          "ecommerce_reseller",
+          "gambling_proceeds",
+          "gifts",
+          "government_benefits",
+          "inheritance",
+          "investments_loans",
+          "pension_retirement",
+          "salary",
+          "sale_of_assets_real_estate",
+          "savings",
+          "someone_elses_funds"
+        ]
+      },
+      "BusinessType": {
+        "type": "string",
+        "enum": [
+          "cooperative",
+          "corporation",
+          "llc",
+          "other",
+          "partnership",
+          "sole_prop",
+          "trust"
+        ]
+      },
+      "AccountPurposeBusiness": {
+        "type": "string",
+        "enum": [
+          "charitable_donations",
+          "ecommerce_retail_payments",
+          "investment_purposes",
+          "other",
+          "payments_to_friends_or_family_abroad",
+          "payroll",
+          "personal_or_living_expenses",
+          "protect_wealth",
+          "purchase_goods_and_services",
+          "receive_payments_for_goods_and_services",
+          "tax_optimization",
+          "third_party_money_transmission",
+          "treasury_management"
+        ]
+      },
+      "SourceOfFundsBusiness": {
+        "type": "string",
+        "enum": [
+          "business_loans",
+          "grants",
+          "inter_company_funds",
+          "investment_proceeds",
+          "legal_settlement",
+          "owners_capital",
+          "pension_retirement",
+          "sale_of_assets",
+          "sales_of_goods_and_services",
+          "tax_refund",
+          "third_party_funds",
+          "treasury_reserves"
+        ]
+      },
+      "EndorsementName": {
+        "type": "string",
+        "description": "背书项目",
+        "enum": [
+          "card",
+          "QR",
+          "wallet"
+        ]
+      },
+      "EndorsementStatus": {
+        "type": "string",
+        "enum": [
+          "incomplete",
+          "approved",
+          "revoked"
+        ]
+      },
+      "EndorsementAdditionalRequirement": {
+        "type": "string",
+        "enum": [
+          "kyc_approval",
+          "tos_acceptance",
+          "kyc_with_proof_of_address",
+          "tos_v2_acceptance"
+        ]
+      },
+      "TransferState": {
+        "type": "string",
+        "enum": [
+          "awaiting_funds",
+          "funds_received",
+          "payment_submitted",
+          "payment_processed",
+          "in_review",
+          "kyc_required",
+          "kyc_in_review",
+          "developer_kyb_required",
+          "canceled",
+          "error",
+          "returned",
+          "refunded",
+          "undeliverable"
+        ]
+      },
+      "SwiftCharge": {
+        "type": "string",
+        "description": "SWIFT 手续费承担方式",
+        "enum": [
+          "our",
+          "sha",
+          "ben"
+        ]
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "street_line_1": {
+            "type": "string"
+          },
+          "street_line_2": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
+          }
+        }
+      },
+      "Capabilities": {
+        "type": "object",
+        "properties": {
+          "payin_crypto": {
+            "$ref": "#/components/schemas/CapabilityState"
+          },
+          "payout_crypto": {
+            "$ref": "#/components/schemas/CapabilityState"
+          },
+          "payin_fiat": {
+            "$ref": "#/components/schemas/CapabilityState"
+          },
+          "payout_fiat": {
+            "$ref": "#/components/schemas/CapabilityState"
+          }
+        }
+      },
+      "RejectReason": {
+        "type": "object",
+        "properties": {
+          "developer_reason": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Endorsement": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/EndorsementName"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EndorsementStatus"
+          },
+          "additional_requirements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EndorsementAdditionalRequirement"
+            }
+          },
+          "requirements": {
+            "type": "object",
+            "properties": {
+              "complete": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "pending": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "missing": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "issues": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "IDInformation": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "证件类型（id, driver_license, military_id 等）"
+          },
+          "issuing_country": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "expiry": {
+            "type": "string"
+          },
+          "image_front": {
+            "type": "string",
+            "description": "存放位置信息"
+          },
+          "image_back": {
+            "type": "string",
+            "description": "存放位置信息"
+          }
+        }
+      },
+      "ProofDocument": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "description": "证明目的（proof_of_* 或 other）"
+          },
+          "file": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "LinkResponse": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "required": [
+          "id",
+          "first_name",
+          "last_name",
+          "email",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "系统唯一 ID"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CustomerStatus"
+          },
+          "capabilities": {
+            "$ref": "#/components/schemas/Capabilities"
+          },
+          "future_requirements_due": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "未来需要补充的材料（如 id_verification）"
+          },
+          "requirements_due": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "当前缺失的材料（如 external_account 或 id_verification）"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reject_reason": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RejectReason"
+            }
+          },
+          "has_accepted_term_of_service": {
+            "type": "boolean"
+          },
+          "endorsements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Endorsement"
+            }
+          }
+        }
+      },
+      "CustomerCreateIndividual": {
+        "type": "object",
+        "required": [
+          "type",
+          "first_name",
+          "last_name",
+          "email"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "middle_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "translated_first_name": {
+            "type": "string"
+          },
+          "translated_middle_name": {
+            "type": "string"
+          },
+          "translated_last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "translated_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "birth_day": {
+            "type": "string"
+          },
+          "sign_agreement_id": {
+            "type": "string"
+          },
+          "endorsement": {
+            "type": "string",
+            "description": "背书项目（card, QR, wallet）"
+          },
+          "account_purpose": {
+            "$ref": "#/components/schemas/AccountPurposeIndividual"
+          },
+          "account_purpose_other": {
+            "type": "string"
+          },
+          "employment_status": {
+            "$ref": "#/components/schemas/EmploymentStatus"
+          },
+          "expected_monthly_payment_usd": {
+            "type": "string",
+            "description": "预估月支付区间（如 0_4999, 5000_100000）"
+          },
+          "act_as_intermedia": {
+            "type": "boolean",
+            "description": "是否为转钱中介"
+          },
+          "source_of_fund": {
+            "$ref": "#/components/schemas/SourceOfFundIndividual"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "verified_govid_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "verified_selfie_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id_information": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IDInformation"
+            }
+          },
+          "document": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProofDocument"
+            }
+          }
+        }
+      },
+      "CustomerCreateBusiness": {
+        "type": "object",
+        "required": [
+          "type",
+          "business_legal_name",
+          "email",
+          "business_type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "business_legal_name": {
+            "type": "string"
+          },
+          "business_trade_name": {
+            "type": "string"
+          },
+          "business_description": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "business_type": {
+            "$ref": "#/components/schemas/BusinessType"
+          },
+          "registered_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "physical_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "signed_agreement_id": {
+            "type": "string"
+          },
+          "is_dao": {
+            "type": "boolean"
+          },
+          "associated_persons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociatedPersonCreate"
+            }
+          },
+          "business_industry": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "has_material_intermediary_ownership": {
+            "type": "boolean"
+          },
+          "account_purpose": {
+            "$ref": "#/components/schemas/AccountPurposeBusiness"
+          },
+          "source_of_funds": {
+            "$ref": "#/components/schemas/SourceOfFundsBusiness"
+          },
+          "id_information": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IDInformation"
+            }
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProofDocument"
+            }
+          },
+          "translated_business_name": {
+            "type": "string"
+          },
+          "translated_business_trade_name": {
+            "type": "string"
+          },
+          "primary_website": {
+            "type": "string"
+          },
+          "other_website": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "translated_registered_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "translated_physical_address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "compliance_screening_explanation": {
+            "type": "string"
+          },
+          "endorsements": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "背书项目（creditcard, QR, wallet 等）"
+            }
+          },
+          "public_trade_listing": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "market_id": {
+                  "type": "string"
+                },
+                "stock_number": {
+                  "type": "string",
+                  "description": "国际证券标识码"
+                },
+                "ticker": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "ownership_threshold": {
+            "type": "integer"
+          },
+          "est_annual_revenue_usd": {
+            "type": "string"
+          },
+          "expected_monthly_payments_usd": {
+            "type": "integer"
+          },
+          "operate_in_prohibited_countries": {
+            "type": "boolean"
+          },
+          "account_purpose_other": {
+            "type": "string"
+          },
+          "high_risk_activities_explanation": {
+            "type": "string"
+          },
+          "high_risk_activities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "adult_entertainment",
+                "gambling",
+                "hold_client_funds",
+                "investment_services",
+                "lending_banking",
+                "marijuana_or_related_services",
+                "money_services",
+                "nicotine_tobacco_or_related_services",
+                "operate_foreign_exchange_virtual_currencies_brokerage_otc",
+                "pharmaceuticals",
+                "precious_metals_precious_stones_jewelry",
+                "safe_deposit_box_rentals",
+                "third_party_payment_processing",
+                "weapons_firearms_and_explosives",
+                "none_of_the_above"
+              ]
+            }
+          },
+          "source_of_fund_description": {
+            "type": "string"
+          },
+          "conducts_money_services": {
+            "type": "boolean"
+          },
+          "using_money_service_evonet": {
+            "type": "boolean"
+          },
+          "using_money_service_description": {
+            "type": "boolean"
+          },
+          "regulated_activity": {
+            "type": "object",
+            "properties": {
+              "regulated_act_description": {
+                "type": "string"
+              },
+              "primary_regulatory_country": {
+                "type": "string"
+              },
+              "primary_regulatory_authority_name": {
+                "type": "string"
+              },
+              "license_number": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "AssociatedPersonCreate": {
+        "type": "object",
+        "required": [
+          "first_name",
+          "last_name",
+          "email"
+        ],
+        "properties": {
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "birth_date": {
+            "type": "string"
+          },
+          "has_ownership": {
+            "type": "boolean"
+          },
+          "has_control": {
+            "type": "boolean"
+          },
+          "is_signer": {
+            "type": "boolean"
+          },
+          "relationship_established_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "middle_name": {
+            "type": "string"
+          },
+          "translated_first_name": {
+            "type": "string"
+          },
+          "translated_last_name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "is_director": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string"
+          },
+          "ownership_percentage": {
+            "type": "integer"
+          },
+          "submitted_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "verified_govid_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "verified_selfie_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_customer_check_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProofDocument"
+            }
+          }
+        }
+      },
+      "AssociatedPersonUpdate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AssociatedPersonCreate"
+          }
+        ]
+      },
+      "AssociatedPerson": {
+        "type": "object",
+        "required": [
+          "id",
+          "first_name",
+          "last_name",
+          "email",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "has_ownership": {
+            "type": "boolean"
+          },
+          "has_control": {
+            "type": "boolean"
+          },
+          "is_signer": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string"
+          },
+          "submitted_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "relationship_established_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Transfer": {
+        "type": "object",
+        "required": [
+          "id",
+          "amount",
+          "currency",
+          "state",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "转账 UUID"
+          },
+          "amount": {
+            "type": "string",
+            "description": "法币计价（字符串以避免精度丢失）"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "on_behalf_of": {
+            "type": "string",
+            "format": "uuid",
+            "description": "平台代哪个客户转账"
+          },
+          "developer_fee": {
+            "type": "string"
+          },
+          "developer_fee_percentage": {
+            "type": "integer"
+          },
+          "source": {
+            "$ref": "#/components/schemas/TransferSource"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/TransferDestination"
+          },
+          "state": {
+            "$ref": "#/components/schemas/TransferState"
+          },
+          "receipt": {
+            "$ref": "#/components/schemas/TransferReceipt"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "client_reference_id": {
+            "type": "string",
+            "description": "开发者侧自定义引用 ID"
+          },
+          "source_deposit_instruction": {
+            "$ref": "#/components/schemas/SourceDepositInstruction"
+          },
+          "return_detail": {
+            "$ref": "#/components/schemas/ReturnDetail"
+          }
+        }
+      },
+      "TransferSource": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "payment_rail": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "payment_scheme": {
+            "type": "string",
+            "description": "支付方案（如 creditcard, QR 等）"
+          },
+          "external_account_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "evonet_wallet_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "from_address": {
+            "type": "string",
+            "description": "稳定币出金的链上地址"
+          },
+          "bank_beneficiary_name": {
+            "type": "string"
+          },
+          "bank_beneficiary_address": {
+            "type": "string"
+          },
+          "bank_routing_number": {
+            "type": "string"
+          },
+          "bank_name": {
+            "type": "string"
+          },
+          "originator_name": {
+            "type": "string"
+          },
+          "originator_address": {
+            "type": "string"
+          },
+          "wire_message": {
+            "type": "string"
+          }
+        }
+      },
+      "TransferDestination": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "payment_rail": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "external_account_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "swift_charge": {
+            "$ref": "#/components/schemas/SwiftCharge"
+          },
+          "blockchain_memo": {
+            "type": "string",
+            "description": "对于支持 memo 的链，转账附言"
+          },
+          "deposit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tracking_number": {
+            "type": "string"
+          },
+          "to_address": {
+            "type": "string",
+            "description": "出金的链上地址"
+          },
+          "evonet_wallet_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "TransferReceipt": {
+        "type": "object",
+        "properties": {
+          "initial_amount": {
+            "type": "string"
+          },
+          "developer_fee": {
+            "type": "string"
+          },
+          "exchange_fee": {
+            "type": "string",
+            "description": "EVONET 收益金额"
+          },
+          "subtotal_amount": {
+            "type": "string"
+          },
+          "remaining_prefunded_balance": {
+            "type": "string"
+          },
+          "gas_fee": {
+            "type": "string"
+          },
+          "final_amount": {
+            "type": "string"
+          },
+          "source_tx_hash": {
+            "type": "string"
+          },
+          "destination_tx_hash": {
+            "type": "string"
+          },
+          "exchange_rate": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "SourceDepositInstruction": {
+        "type": "object",
+        "description": "需要客户先垫付资金时的指引",
+        "properties": {
+          "payment_rail": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "from_address": {
+            "type": "string",
+            "description": "payin crypto address"
+          },
+          "to_address": {
+            "type": "string",
+            "description": "payout to crypto address"
+          },
+          "deposit_message": {
+            "type": "string"
+          },
+          "bank_name": {
+            "type": "string"
+          },
+          "bank_address": {
+            "type": "string"
+          },
+          "bank_routing_number": {
+            "type": "string"
+          },
+          "bank_account_number": {
+            "type": "string"
+          },
+          "beneficiary_name": {
+            "type": "string"
+          },
+          "beneficiary_address": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string"
+          },
+          "bic": {
+            "type": "string"
+          },
+          "account_holder_name": {
+            "type": "string"
+          },
+          "blockchain_memo": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnDetail": {
+        "type": "object",
+        "description": "转账被退回的原因",
+        "properties": {
+          "reason": {
+            "type": "string"
+          },
+          "refund_reference_id": {
+            "type": "string"
+          }
+        }
+      },
+      "TransferTemplate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "CurrencyFiat": {
+        "type": "string",
+        "enum": [
+          "usd",
+          "eur"
+        ]
+      },
+      "AccountType": {
+        "type": "string",
+        "enum": [
+          "bank",
+          "iban"
+        ]
+      },
+      "FeeConfig": {
+        "type": "object",
+        "required": [
+          "default_liquidation_address_fee_percent"
+        ],
+        "properties": {
+          "default_liquidation_address_fee_percent": {
+            "type": "string",
+            "description": "组织层面清算地址费率（BPS），字符串小数表示，如 \"0.5\""
+          }
+        }
+      },
+      "BankAccount": {
+        "type": "object",
+        "properties": {
+          "routing_number": {
+            "type": "string"
+          },
+          "account_number": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string"
+          },
+          "bic": {
+            "type": "string"
+          },
+          "swift": {
+            "type": "string"
+          }
+        }
+      },
+      "FeeExternalAccount": {
+        "type": "object",
+        "required": [
+          "id",
+          "customer_id",
+          "currency",
+          "account_owner_name",
+          "account_type",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "外部账户 UUID"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "外部账户所属的客户/组织"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyFiat"
+          },
+          "account_owner_name": {
+            "type": "string"
+          },
+          "account_type": {
+            "$ref": "#/components/schemas/AccountType"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "bank_name": {
+            "type": "string"
+          },
+          "account": {
+            "$ref": "#/components/schemas/BankAccount"
+          },
+          "swift": {
+            "type": "string",
+            "description": "兼容字段（如未放入 account.swift 时）"
+          },
+          "bank_account": {
+            "type": "string",
+            "description": "兼容字段（如仅提供原始账号标识）"
+          },
+          "account_owner_type": {
+            "type": "string",
+            "description": "账户所有者类型（individual 或 business 等）"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "business_name": {
+            "type": "string"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          }
+        }
+      },
+      "AccountOwnerType": {
+        "type": "string",
+        "enum": [
+          "individual",
+          "business"
+        ]
+      },
+      "BankAccountDetails": {
+        "type": "object",
+        "properties": {
+          "routing_number": {
+            "type": "string",
+            "description": "不同国家/地区的路由号字段（本地化）"
+          },
+          "account_number": {
+            "type": "string",
+            "description": "账户号（如适用）"
+          },
+          "bank_name": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string"
+          },
+          "bic": {
+            "type": "string"
+          }
+        }
+      },
+      "SwiftDetails": {
+        "type": "object",
+        "properties": {
+          "bic": {
+            "type": "string"
+          },
+          "iban": {
+            "type": "string"
+          },
+          "account_number": {
+            "type": "string"
+          },
+          "correspondent_bank": {
+            "type": "string"
+          }
+        }
+      },
+      "ExternalAccount": {
+        "type": "object",
+        "required": [
+          "id",
+          "customer_id",
+          "currency",
+          "account_owner_name",
+          "account_owner_type",
+          "created_at",
+          "updated_at",
+          "active"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "外部账户标识符"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "EVONET 系统内部用户 ID"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "account_owner_name": {
+            "type": "string"
+          },
+          "account_type": {
+            "type": "string",
+            "description": "账户类型，随国家/体系不同而异"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "bank_account": {
+            "$ref": "#/components/schemas/BankAccountDetails"
+          },
+          "swift": {
+            "$ref": "#/components/schemas/SwiftDetails"
+          },
+          "card": {
+            "$ref": "#/components/schemas/CardDetails"
+          },
+          "account_owner_type": {
+            "$ref": "#/components/schemas/AccountOwnerType"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "business_name": {
+            "type": "string"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          }
+        }
+      },
+      "ExternalAccountCreate": {
+        "type": "object",
+        "description": "创建外部账户的请求体",
+        "required": [
+          "currency",
+          "account_owner_name",
+          "account_owner_type"
+        ],
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "account_owner_name": {
+            "type": "string"
+          },
+          "account_owner_type": {
+            "$ref": "#/components/schemas/AccountOwnerType"
+          },
+          "account_type": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "business_name": {
+            "type": "string"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "bank_account": {
+            "$ref": "#/components/schemas/BankAccountDetails"
+          },
+          "swift": {
+            "$ref": "#/components/schemas/SwiftDetails"
+          },
+          "card": {
+            "$ref": "#/components/schemas/CardDetails"
+          }
+        }
+      },
+      "ExternalAccountUpdate": {
+        "type": "object",
+        "description": "更新外部账户的请求体",
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "account": {
+            "type": "object",
+            "properties": {
+              "routing_number": {
+                "type": "string",
+                "description": "账户路由号（字段遵循本地化规则）"
+              }
+            }
+          }
+        }
+      },
+      "ExchangeRate": {
+        "type": "object",
+        "required": [
+          "midmarket_rate",
+          "buy_rate",
+          "sell_rate"
+        ],
+        "properties": {
+          "midmarket_rate": {
+            "type": "string",
+            "description": "中间价（mid-market rate）"
+          },
+          "buy_rate": {
+            "type": "string",
+            "description": "买入价（buy rate）"
+          },
+          "sell_rate": {
+            "type": "string",
+            "description": "卖出价（sell rate）"
+          }
+        }
+      },
+      "KycType": {
+        "type": "string",
+        "enum": [
+          "individual",
+          "business"
+        ]
+      },
+      "KycStatus": {
+        "type": "string",
+        "enum": [
+          "not_started",
+          "incomplete",
+          "awaiting_ubo",
+          "under_review",
+          "approved",
+          "rejected",
+          "paused",
+          "offboarded"
+        ]
+      },
+      "TosStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "approved"
+        ]
+      },
+      "KycLink": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "kyc_link",
+          "kyc_status",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "KYC link ID"
+          },
+          "type": {
+            "$ref": "#/components/schemas/KycType"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "kyc_link": {
+            "type": "string",
+            "format": "uri"
+          },
+          "kyc_status": {
+            "$ref": "#/components/schemas/KycStatus"
+          },
+          "reject_reason": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RejectReason"
+            }
+          },
+          "tos_link": {
+            "type": "string",
+            "format": "uri"
+          },
+          "tos_status": {
+            "$ref": "#/components/schemas/TosStatus"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "KycLinkCreateRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "type",
+          "full_name",
+          "redirect_url"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "type": {
+            "$ref": "#/components/schemas/KycType"
+          },
+          "endorsement": {
+            "type": "string",
+            "description": "背书类型"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "redirect_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "TokenCurrency": {
+        "type": "string",
+        "enum": [
+          "usdc",
+          "usdt",
+          "usd"
+        ]
+      },
+      "LiquidationState": {
+        "type": "string",
+        "description": "清算地址状态",
+        "enum": [
+          "active",
+          "deactive"
+        ]
+      },
+      "DrainState": {
+        "type": "string",
+        "description": "资金流转状态",
+        "enum": [
+          "awaiting_funds",
+          "in_review",
+          "funds_received",
+          "payment_submitted",
+          "payment_processed",
+          "canceled",
+          "error",
+          "undeliverable",
+          "returned",
+          "refunded"
+        ]
+      },
+      "AddressOnChain": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "链上地址"
+          },
+          "blockchain_memo": {
+            "type": "string"
+          }
+        }
+      },
+      "DestinationDetail": {
+        "type": "object",
+        "properties": {
+          "payment_rail": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "currency": {
+            "type": "string",
+            "description": "出金的目标币种（可为加密或法币）"
+          },
+          "to_address": {
+            "type": "string",
+            "description": "出金链上地址（如为链上出金）"
+          },
+          "external_account_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "出金银行/外部账户 ID（如为法币出金）"
+          },
+          "trace_number": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ReturnDetails": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "Receipt": {
+        "type": "object",
+        "description": "金额均以清算地址的币种口径展示",
+        "properties": {
+          "initial_amount": {
+            "type": "string",
+            "description": "原始交易金额"
+          },
+          "developer_fee": {
+            "type": "string",
+            "description": "开发者分润金额"
+          },
+          "subtotal_amount": {
+            "type": "string",
+            "description": "initial_amount - developer_fee"
+          },
+          "converted_amount": {
+            "type": "string",
+            "description": "按目标币种折算的金额"
+          },
+          "exchange_rate": {
+            "type": "string",
+            "description": "目标金额 / (initial_amount - developer_fee)"
+          },
+          "outgoing_amount": {
+            "type": "string",
+            "description": "最终出金额 = converted_amount - gas_fee"
+          },
+          "destination_currency": {
+            "type": "string",
+            "description": "发送给客户的目标币种"
+          },
+          "gas_fee": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "LiquidationAddress": {
+        "type": "object",
+        "required": [
+          "id",
+          "currency",
+          "chain",
+          "customer_id",
+          "address",
+          "created_at",
+          "updated_at",
+          "state"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "清算地址在系统内部的代号"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/TokenCurrency"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "该地址所属的客户 UUID"
+          },
+          "external_customer_id": {
+            "type": "string",
+            "description": "目标外部银行账户 ID（需与目标币种一致，关联 external_account）"
+          },
+          "destination_payment_rail": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "destination_currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "address": {
+            "type": "string",
+            "description": "平台分配给用户的充值/清算地址"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "prefunded_account_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "开发者的预充值账户，用于接收代理/开发者分润"
+          },
+          "custom_developer_fee_percent": {
+            "type": "string",
+            "description": "开发者自定义费率（bps）"
+          },
+          "global_developer_fee_percent": {
+            "type": "string",
+            "description": "全局缺省费率（bps）"
+          },
+          "destination_transfer_message": {
+            "type": "string",
+            "description": "出金转账附言"
+          },
+          "destination_reference": {
+            "type": "string",
+            "description": "出金参考号/附言"
+          },
+          "destination_address": {
+            "type": "string",
+            "description": "用户链上自有收款地址（如为链上出金）"
+          },
+          "destination_blockchain_memo": {
+            "type": "string"
+          },
+          "return_address": {
+            "type": "string",
+            "description": "退款地址（通常与入金地址一致；为未来用途预留）"
+          },
+          "evonet_wallet_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "$ref": "#/components/schemas/LiquidationState"
+          }
+        }
+      },
+      "LiquidationAddressCreate": {
+        "type": "object",
+        "required": [
+          "currency",
+          "chain",
+          "destination_currency"
+        ],
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/TokenCurrency"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "external_customer_id": {
+            "type": "string",
+            "description": "目标外部银行账户 ID（与 external_account 对应）"
+          },
+          "prefunded_account_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "预充值账户（用于分润）"
+          },
+          "evonet_wallet_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "destination_payment_rail": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "destination_currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "destination_address": {
+            "type": "string",
+            "description": "用户自有链上地址（出金到链上时必填）"
+          },
+          "custom_developer_fee_percent": {
+            "type": "string",
+            "description": "自定义费率（bps）"
+          },
+          "destination_blockchain_memo": {
+            "type": "string"
+          },
+          "return_address": {
+            "type": "string",
+            "description": "退款地址"
+          }
+        }
+      },
+      "LiquidationAddressUpdate": {
+        "type": "object",
+        "properties": {
+          "external_customer_id": {
+            "type": "string",
+            "description": "目标外部银行账户 ID（与 external_account 对应）"
+          },
+          "return_address": {
+            "type": "string",
+            "description": "退款地址"
+          }
+        }
+      },
+      "LiquidationDrain": {
+        "type": "object",
+        "required": [
+          "id",
+          "amount",
+          "customer_id",
+          "liquidation_address_id",
+          "currency",
+          "state",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "liquidation_address_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/TokenCurrency"
+          },
+          "state": {
+            "$ref": "#/components/schemas/DrainState"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deposit_tx_hash": {
+            "type": "string"
+          },
+          "from_address": {
+            "type": "string",
+            "description": "资金来源链上地址（转入到 liquidation address）"
+          },
+          "source_payment_rail": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/DestinationDetail"
+          },
+          "destination_tx_hash": {
+            "type": "string"
+          },
+          "refund_tx_hash": {
+            "type": "string"
+          },
+          "return_details": {
+            "$ref": "#/components/schemas/ReturnDetails"
+          },
+          "receipt": {
+            "$ref": "#/components/schemas/Receipt"
+          }
+        }
+      },
+      "PrefundedAccount": {
+        "type": "object",
+        "required": [
+          "id",
+          "available_balance",
+          "currency",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Prefunded account ID"
+          },
+          "available_balance": {
+            "type": "string",
+            "description": "账户可用余额"
+          },
+          "currency": {
+            "type": "string",
+            "description": "余额币种"
+          },
+          "name": {
+            "type": "string",
+            "description": "账户名称（用于识别对手交易）"
+          }
+        }
+      },
+      "PrefundedAccountHistory": {
+        "type": "object",
+        "required": [
+          "id",
+          "amount",
+          "available_balance",
+          "currency",
+          "name",
+          "type",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "历史记录 ID"
+          },
+          "amount": {
+            "type": "string",
+            "description": "交易金额"
+          },
+          "available_balance": {
+            "type": "string",
+            "description": "交易后账户余额"
+          },
+          "currency": {
+            "type": "string",
+            "description": "币种"
+          },
+          "name": {
+            "type": "string",
+            "description": "账户名称"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "funding",
+              "refunded_transfer"
+            ],
+            "description": "交易类型（funding / refunded transfer）"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "记录创建时间"
+          },
+          "withdrawal_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "取款 ID（与 deposit_id 互斥）"
+          },
+          "deposit_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "存款 ID（与 withdrawal_id 互斥）"
+          }
+        }
+      },
+      "TransferStatus": {
+        "type": "string",
+        "description": "交易状态（Transaction Status）",
+        "enum": [
+          "awaiting_funds",
+          "in_review",
+          "funds_received",
+          "payment_submitted",
+          "payment_processed",
+          "undeliverable",
+          "returned",
+          "refunded",
+          "canceled",
+          "error"
+        ]
+      },
+      "TransferStatusDescriptions": {
+        "type": "object",
+        "description": "各交易状态详细说明",
+        "properties": {
+          "awaiting_funds": {
+            "type": "string",
+            "description": "EVONET 正在等待客户资金到账，尚未开始处理转账。 适用于加密货币充值、电汇或 ACH 入账。\n"
+          },
+          "in_review": {
+            "type": "string",
+            "description": "临时状态，表示转账数据需进一步验证。 一般数秒内自动解决，如持续超过 24 小时，EVONET 将联系客户。\n"
+          },
+          "funds_received": {
+            "type": "string",
+            "description": "EVONET 已收到客户资金，正在准备代表客户进行转账。\n"
+          },
+          "payment_submitted": {
+            "type": "string",
+            "description": "EVONET 已发起支付，正在等待确认。 完成时间取决于支付通道：加密货币几分钟，电汇数小时，ACH 可能需数天。\n"
+          },
+          "payment_processed": {
+            "type": "string",
+            "description": "转账已完成，资金成功到达目标账户。\n"
+          },
+          "undeliverable": {
+            "type": "string",
+            "description": "EVONET 未能完成转账，可能原因包括无效的目标账户或目标不支持该资产。\n"
+          },
+          "returned": {
+            "type": "string",
+            "description": "支付已发送但失败，资金退回 EVONET。系统将启动退款流程，将资金返还发起方。\n"
+          },
+          "refunded": {
+            "type": "string",
+            "description": "转账已退款，资金已返还给原始发送方。\n"
+          },
+          "canceled": {
+            "type": "string",
+            "description": "转账已被取消。仅可在 awaiting_funds 状态下通过 DELETE `/v0/transfers/{transferID}` 取消。\n"
+          },
+          "error": {
+            "type": "string",
+            "description": "处理过程中发生错误，无法继续。通常需要人工审核或开发者介入。\n"
+          }
+        }
+      },
+      "TransferCreate": {
+        "type": "object",
+        "required": [
+          "on_behalf_of",
+          "amount",
+          "source",
+          "destination"
+        ],
+        "properties": {
+          "on_behalf_of": {
+            "type": "string",
+            "format": "uuid",
+            "description": "平台代表哪个客户进行的转账操作（客户 UUID）"
+          },
+          "source": {
+            "$ref": "#/components/schemas/TransferSource"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/TransferDestination"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "可选的客户端生成 UUID（如提供将用于去重）"
+          },
+          "client_reference_id": {
+            "type": "string",
+            "description": "开发者侧自定义引用 ID"
+          },
+          "amount": {
+            "type": "string",
+            "description": "法币计价；如为加密资产将先换算为法币"
+          },
+          "developer_fee": {
+            "type": "string",
+            "description": "开发者预留的手续费金额"
+          },
+          "developer_fee_percentage": {
+            "type": "integer",
+            "description": "开发者预留手续费的百分比"
+          },
+          "features": {
+            "type": "object",
+            "properties": {
+              "flexible_amount": {
+                "type": "boolean",
+                "description": "允许转账金额可变；启用时固定金额与固定费额不生效"
+              },
+              "static_template": {
+                "type": "boolean",
+                "description": "使用模板中定义的固定金额"
+              },
+              "allow_any_from_address": {
+                "type": "boolean",
+                "description": "允许未知 from_address（如交易所出金场景）"
+              }
+            }
+          }
+        }
+      },
+      "TransferUpdate": {
+        "type": "object",
+        "description": "仅在 `awaiting_funds` 状态下可更新",
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "法币计价金额"
+          },
+          "developer_fee": {
+            "type": "string",
+            "description": "开发者预留手续费金额"
+          },
+          "developer_fee_percentage": {
+            "type": "integer",
+            "description": "开发者预留手续费百分比"
+          }
+        }
+      },
+      "VAStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "deactive"
+        ]
+      },
+      "VirtualAccount": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "customer_id",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "VA ID"
+          },
+          "status": {
+            "$ref": "#/components/schemas/VAStatus"
+          },
+          "developer_fee_percent": {
+            "type": "string",
+            "description": "开发者费率（bps）"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source_deposit_instructions": {
+            "type": "object",
+            "properties": {
+              "payment_rail": {
+                "$ref": "#/components/schemas/PaymentRail"
+              },
+              "currency": {
+                "$ref": "#/components/schemas/TokenCurrency"
+              },
+              "bank_name": {
+                "type": "string"
+              },
+              "bank_address": {
+                "type": "string"
+              },
+              "bank_routing_number": {
+                "type": "string"
+              },
+              "bank_account": {
+                "type": "string"
+              },
+              "beneficiary_name": {
+                "type": "string"
+              },
+              "beneficiary_address": {
+                "type": "string"
+              },
+              "holder_name": {
+                "type": "string"
+              }
+            }
+          },
+          "destination": {
+            "type": "object",
+            "properties": {
+              "currency": {
+                "$ref": "#/components/schemas/TokenCurrency"
+              },
+              "payment_rail": {
+                "$ref": "#/components/schemas/PaymentRail"
+              },
+              "address": {
+                "type": "string"
+              },
+              "blockchain_memo": {
+                "type": "string"
+              },
+              "evonet_wallet_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "prefund_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        }
+      },
+      "VirtualAccountCreate": {
+        "type": "object",
+        "required": [
+          "source",
+          "destination"
+        ],
+        "properties": {
+          "source": {
+            "type": "object",
+            "properties": {
+              "currency": {
+                "$ref": "#/components/schemas/TokenCurrency"
+              }
+            }
+          },
+          "destination": {
+            "type": "object",
+            "properties": {
+              "currency": {
+                "$ref": "#/components/schemas/TokenCurrency"
+              },
+              "payment_rail": {
+                "$ref": "#/components/schemas/PaymentRail"
+              },
+              "address": {
+                "type": "string"
+              },
+              "blockchain_memo": {
+                "type": "string"
+              },
+              "evonet_wallet_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "prefund_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          "developer_fee_percent": {
+            "type": "string"
+          }
+        }
+      },
+      "VirtualAccountUpdate": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "object",
+            "properties": {
+              "currency": {
+                "$ref": "#/components/schemas/TokenCurrency"
+              },
+              "payment_rail": {
+                "$ref": "#/components/schemas/PaymentRail"
+              },
+              "address": {
+                "type": "string"
+              },
+              "blockchain_memo": {
+                "type": "string"
+              },
+              "evonet_wallet_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "prefund_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          "developer_fee_percent": {
+            "type": "string"
+          }
+        }
+      },
+      "VAActivity": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "customer_id",
+          "virtual_account_id",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "事件 ID"
+          },
+          "type": {
+            "$ref": "#/components/parameters/EventType/schema"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "virtual_account_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/TokenCurrency"
+          },
+          "developer_fee_amount": {
+            "type": "string"
+          },
+          "exchange_fee_amount": {
+            "type": "string"
+          },
+          "subtotal_amount": {
+            "type": "string"
+          },
+          "gas_fee": {
+            "type": "string"
+          },
+          "deposit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "destination_tx_hash": {
+            "type": "string"
+          },
+          "destination_payment_rail": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "payment_rail": {
+                "$ref": "#/components/schemas/PaymentRail"
+              },
+              "description": {
+                "type": "string"
+              },
+              "sender_name": {
+                "type": "string"
+              },
+              "sender_bank_routing_number": {
+                "type": "string"
+              },
+              "trace_number": {
+                "type": "string"
+              },
+              "routing_number": {
+                "type": "string"
+              },
+              "bank_name": {
+                "type": "string"
+              },
+              "bank_account": {
+                "type": "string"
+              },
+              "beneficiary_name": {
+                "type": "string"
+              },
+              "beneficiary_address": {
+                "type": "string"
+              },
+              "reference": {
+                "type": "string"
+              },
+              "tracking_number": {
+                "type": "string"
+              }
+            }
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "initial_amount": {
+                "type": "string"
+              },
+              "developer_fee": {
+                "type": "string"
+              },
+              "exchange_fee": {
+                "type": "string"
+              },
+              "subtotal_amount": {
+                "type": "string"
+              },
+              "remaining_prefunded_balance": {
+                "type": "string"
+              },
+              "final_amount": {
+                "type": "string"
+              },
+              "source_tx_hash": {
+                "type": "string"
+              },
+              "destination_tx_hash": {
+                "type": "string"
+              },
+              "exchange_rate": {
+                "type": "string"
+              },
+              "gas_fee": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Currency": {
+        "type": "string",
+        "enum": [
+          "usdt",
+          "usdc",
+          "usd"
+        ],
+        "description": "支持币种"
+      },
+      "Wallet": {
+        "type": "object",
+        "required": [
+          "chain",
+          "id",
+          "address",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "全局唯一 ID (UUID)"
+          },
+          "address": {
+            "type": "string",
+            "description": "链上地址"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "description": "钱包实体定义。"
+      },
+      "BalanceItem": {
+        "type": "object",
+        "required": [
+          "balance",
+          "currency",
+          "chain"
+        ],
+        "properties": {
+          "balance": {
+            "type": "string",
+            "description": "指定币种余额（字符串避免精度丢失）"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string",
+            "nullable": true,
+            "description": "合约地址；原生代币为空"
+          }
+        }
+      },
+      "TotalBalance": {
+        "type": "object",
+        "required": [
+          "balance",
+          "currency",
+          "chain"
+        ],
+        "properties": {
+          "balance": {
+            "type": "string"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "chain": {
+            "$ref": "#/components/schemas/Chain"
+          },
+          "contract_address": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TransactionEndpointSource": {
+        "type": "object",
+        "properties": {
+          "payment_rail": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "payment_currency": {
+            "$ref": "#/components/schemas/Currency"
+          }
+        }
+      },
+      "TransactionEndpointDestination": {
+        "type": "object",
+        "properties": {
+          "payment_rail": {
+            "$ref": "#/components/schemas/PaymentRail"
+          },
+          "payment_currency": {
+            "$ref": "#/components/schemas/Currency"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "required": [
+          "amount",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "amount": {
+            "type": "string",
+            "description": "交易金额，单位 USD (字符串)"
+          },
+          "developer_fee": {
+            "type": "string",
+            "description": "开发者/客户预留手续费，美元计价"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "关联客户 ID（如有）"
+          },
+          "source": {
+            "$ref": "#/components/schemas/TransactionEndpointSource"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/TransactionEndpointDestination"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "trace_id"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "trace_id": {
+            "type": "string"
+          }
+        }
+      },
+      "WebhookStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "disabled",
+          "deleted"
+        ]
+      },
+      "EventCategory": {
+        "type": "string",
+        "enum": [
+          "customer",
+          "kyc_link",
+          "liquidation_address.drain",
+          "static_memo.activity",
+          "transfer",
+          "virtual_account.activity",
+          "card_account",
+          "card_transaction",
+          "card_withdrawal",
+          "posted_card_account_transaction"
+        ]
+      },
+      "EventType": {
+        "type": "string",
+        "description": "与 event_category 组合使用的事件后缀",
+        "enum": [
+          "created",
+          "updated",
+          "updated.status_transitioned",
+          "deleted",
+          "canceled"
+        ]
+      },
+      "EventObjectStatus": {
+        "type": "string",
+        "enum": [
+          "not_started",
+          "incomplete",
+          "active",
+          "rejected",
+          "under_review",
+          "manual_review",
+          "awaiting_ubo",
+          "approved",
+          "awaiting_funds",
+          "funds_received",
+          "payment_submitted",
+          "payment_processed",
+          "in_review",
+          "canceled",
+          "error",
+          "returned",
+          "refunded",
+          "undeliverable"
+        ]
+      },
+      "EventEpoch": {
+        "type": "string",
+        "enum": [
+          "webhook_creation",
+          "beginning_of_time"
+        ]
+      },
+      "WebhookEndpoint": {
+        "type": "object",
+        "required": [
+          "id",
+          "url",
+          "status",
+          "public_key",
+          "event_categories"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Webhook ID"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Webhook 投递目标 URL"
+          },
+          "status": {
+            "$ref": "#/components/schemas/WebhookStatus"
+          },
+          "public_key": {
+            "type": "string",
+            "description": "用于验签的公钥，确保事件来源可信"
+          },
+          "event_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventCategory"
+            }
+          }
+        }
+      },
+      "WebhookCreateRequest": {
+        "type": "object",
+        "required": [
+          "url",
+          "event_epoch",
+          "event_categories"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "接收 Webhook 的 URL"
+          },
+          "event_epoch": {
+            "$ref": "#/components/schemas/EventEpoch"
+          },
+          "event_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventCategory"
+            }
+          }
+        }
+      },
+      "WebhookUpdateRequest": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "待更新的 Webhook ID"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "接收 Webhook 的 URL"
+          },
+          "status": {
+            "$ref": "#/components/schemas/WebhookStatus"
+          },
+          "event_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventCategory"
+            }
+          }
+        }
+      },
+      "WebhookEventPreview": {
+        "type": "object",
+        "properties": {
+          "api_version": {
+            "type": "string"
+          },
+          "event_id": {
+            "type": "string"
+          },
+          "event_developer_id": {
+            "type": "string"
+          },
+          "event_category": {
+            "$ref": "#/components/schemas/EventCategory"
+          },
+          "event_type": {
+            "$ref": "#/components/schemas/EventType"
+          },
+          "event_object_id": {
+            "type": "string"
+          },
+          "event_object": {
+            "type": "object",
+            "description": "受影响的对象（结构随类别而变）",
+            "additionalProperties": true
+          },
+          "event_object_changes": {
+            "type": "object",
+            "description": "对象字段变更（差异）",
+            "additionalProperties": true
+          },
+          "event_created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "event_sequence": {
+            "type": "integer"
+          },
+          "event_object_status": {
+            "$ref": "#/components/schemas/EventObjectStatus"
+          }
+        }
+      },
+      "WebhookDeliveryLog": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "目标服务返回的 HTTP 状态码"
+          },
+          "event_id": {
+            "type": "string"
+          },
+          "response_body": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WebhookEchoSendRequest": {
+        "type": "object",
+        "required": [
+          "event_id"
+        ],
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "description": "要回放的事件 ID"
+          }
+        }
+      },
+      "WebhookEchoSendResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "CustomerId": {
+        "name": "customer_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "客户 UUID"
+      },
+      "CardAccountId": {
+        "name": "card_account_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "TransactionId": {
+        "name": "transaction_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "CardWithdrawalId": {
+        "name": "card_withdrawal_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "返回的项目数（默认为 10，最多 100）",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10
+        }
+      },
+      "StartingAfter": {
+        "name": "starting_after",
+        "in": "query",
+        "description": "返回该钱包 ID 之后的钱包列表",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "EndingBefore": {
+        "name": "ending_before",
+        "in": "query",
+        "description": "返回该钱包 ID 之前的钱包列表",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "StatementPeriod": {
+        "name": "period",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$"
+        },
+        "description": "对账期（YYYYMM）"
+      },
+      "AssociatedPersonId": {
+        "name": "associated_person_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "ExternalAccountId": {
+        "name": "external_account_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "CustomerIdQuery": {
+        "name": "customer_id",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "按客户 UUID 过滤"
+      },
+      "Email": {
+        "name": "email",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "email"
+        },
+        "description": "按邮箱过滤"
+      },
+      "Limit10to100": {
+        "name": "limit",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 100,
+          "default": 10
+        },
+        "description": "返回条数限制（10–100）"
+      },
+      "KycLinkId": {
+        "name": "kyc_link_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "KYC 链接 UUID"
+      },
+      "LiquidationAddressId": {
+        "name": "liquidation_address_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "清算地址 UUID"
+      },
+      "UpdatedAfterMs": {
+        "name": "updated_after_ms",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "UpdatedBeforeMs": {
+        "name": "updated_before_ms",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "PrefundedAccountId": {
+        "name": "prefunded_account_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Prefunded account UUID"
+      },
+      "TransferId": {
+        "name": "transfer_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "VirtualAccountId": {
+        "name": "virtual_account_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "虚拟账户 UUID"
+      },
+      "Status": {
+        "name": "status",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "active",
+            "deactive"
+          ]
+        },
+        "description": "虚拟账户状态筛选"
+      },
+      "EventType": {
+        "name": "event_type",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "funds_scheduled",
+            "funds_received",
+            "payment_submitted",
+            "payment_processed",
+            "in_review",
+            "refund",
+            "microdeposit",
+            "account_update",
+            "deactivation",
+            "activation"
+          ]
+        },
+        "description": "VA 事件类型筛选"
+      },
+      "WebhookId": {
+        "name": "webhook_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Webhook 端点 ID"
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "api_key"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "batchSettlement",
+      "description": "批量清算计划创建接口（无示例、无状态码版）"
+    },
+    {
+      "name": "card",
+      "description": "卡账户、PIN、移动钱包、交易、授权控制与对账单接口（无示例、无状态码版）"
+    },
+    {
+      "name": "customer",
+      "description": "客户、关联人员、交易与链接相关接口（无示例、无状态码版）"
+    },
+    {
+      "name": "developer",
+      "description": "组织维度的清算地址费率与费用收款外部账户配置（无示例、无状态码版）"
+    },
+    {
+      "name": "externalAccount",
+      "description": "客户外部账户的查询、创建、更新、删除与激活"
+    },
+    {
+      "name": "fxrate",
+      "description": "外汇与加密货币汇率查询接口（无示例、无状态码版）"
+    },
+    {
+      "name": "kycLink",
+      "description": "个体与企业的 KYC 链接管理（无示例、无状态码版）"
+    },
+    {
+      "name": "liquidationAddress",
+      "description": "清算地址与资金流（Drains）接口（无示例、无状态码版）"
+    },
+    {
+      "name": "prefundedAccount",
+      "description": "预充值账户查询与历史记录（无示例、无状态码版）"
+    },
+    {
+      "name": "transfer",
+      "description": "平台转账接口（无示例、无状态码版）"
+    },
+    {
+      "name": "virtualAccount",
+      "description": "管理虚拟账户（VA）及其资金活动的接口定义（无示例、无状态码版）"
+    },
+    {
+      "name": "wallet",
+      "description": "钱包与交易查询接口（无示例 & 无状态码版）。\n- 统一使用 ISO 8601 UTC 时间（format: date-time）\n- 统一错误结构：code / message / details / trace_id\n- 分页参数：limit / starting_after / ending_before\n"
+    },
+    {
+      "name": "webhook",
+      "description": "Webhook 端点管理、事件预览、投递日志与回环测试（无示例、无状态码版）"
+    }
+  ]
+};
+            
             window.ui = SwaggerUIBundle({
-                url: './openapi.json?v=' + timestamp,
+                spec: spec,
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [
