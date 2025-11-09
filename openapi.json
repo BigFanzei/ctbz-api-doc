@@ -7194,10 +7194,6 @@
       "description": "APIs from prefundedAccount.yaml"
     },
     {
-      "name": "transactionStatus",
-      "description": "APIs from transactionStatus.yaml"
-    },
-    {
       "name": "transfer",
       "description": "APIs from transfer.yaml"
     },

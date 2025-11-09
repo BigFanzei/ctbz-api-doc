@@ -76,8 +76,29 @@ files.forEach(file => {
   }
 });
 
-// Add tags array at the end in the order encountered
-mergedSpec.tags = Array.from(tagMap.values());
+// Add tags array at the end, but only include tags that have operations
+const tagsWithOps = [];
+tagMap.forEach((tag, tagName) => {
+  // Count operations with this tag
+  let count = 0;
+  Object.keys(mergedSpec.paths).forEach(pathKey => {
+    const pathItem = mergedSpec.paths[pathKey];
+    ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'].forEach(method => {
+      if (pathItem[method] && pathItem[method].tags && pathItem[method].tags.includes(tagName)) {
+        count++;
+      }
+    });
+  });
+
+  // Only add tag if it has at least one operation
+  if (count > 0) {
+    tagsWithOps.push(tag);
+  } else {
+    console.log(`   ⚠️  Skipping tag "${tagName}" (0 operations)`);
+  }
+});
+
+mergedSpec.tags = tagsWithOps;
 
 fs.writeFileSync(outputJsonFile, JSON.stringify(mergedSpec, null, 2));
 
