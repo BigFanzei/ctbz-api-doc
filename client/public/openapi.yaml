@@ -4696,8 +4696,6 @@ tags:
     description: 清算地址与资金流（Drains）接口（无示例、无状态码版）
   - name: Prefunded Account
     description: 预充值账户查询与历史记录（无示例、无状态码版）
-  - name: Transaction Status
-    description: 转账状态码定义说明（EVONET 系统）
   - name: Transfer
     description: 平台转账接口（无示例、无状态码版）
   - name: Virtual Account

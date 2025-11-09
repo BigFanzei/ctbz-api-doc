@@ -58,15 +58,15 @@ files.forEach(file => {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 
-  // 添加 tag 定义
-  const tagDescription = spec.info?.description || `${tagName} related APIs`;
-  tagSet.add(JSON.stringify({
-    name: tagName,
-    description: tagDescription
-  }));
-
   // 合并paths，并为每个操作添加 tag
-  if (spec.paths) {
+  if (spec.paths && Object.keys(spec.paths).length > 0) {
+    // 只有当文件包含 paths 时才添加 tag 定义
+    const tagDescription = spec.info?.description || `${tagName} related APIs`;
+    tagSet.add(JSON.stringify({
+      name: tagName,
+      description: tagDescription
+    }));
+
     Object.keys(spec.paths).forEach(pathKey => {
       const pathItem = spec.paths[pathKey];
       // 为每个 HTTP 方法添加 tag
