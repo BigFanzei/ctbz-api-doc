@@ -19,12 +19,19 @@ function filterSpecByTag(spec: any, tag: string | null) {
   // 过滤路径：只保留以指定标签开头的路径
   const filteredPaths: any = {};
 
+  // 标准化tag名称：支持单复数匹配
+  const normalizedTag = tag.toLowerCase();
+
   Object.keys(filteredSpec.paths).forEach((path) => {
     // 提取路径的第一段作为标签（例如 /customers/... -> customers）
     const pathSegments = path.split('/').filter(Boolean);
-    const pathTag = pathSegments[0];
+    const pathTag = pathSegments[0]?.toLowerCase();
 
-    if (pathTag === tag) {
+    // 支持精确匹配或单复数匹配
+    if (pathTag === normalizedTag ||
+        pathTag === normalizedTag + 's' ||
+        pathTag + 's' === normalizedTag ||
+        pathTag.replace(/s$/, '') === normalizedTag.replace(/s$/, '')) {
       filteredPaths[path] = filteredSpec.paths[path];
     }
   });
