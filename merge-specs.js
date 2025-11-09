@@ -23,11 +23,10 @@ const mergedSpec = {
     schemas: {},
     parameters: {},
     securitySchemes: {}
-  },
-  tags: [],
-  'x-tagGroups': []
+  }
 };
 
+const tagMap = new Map();
 const files = fs.readdirSync(specsDir).filter(f => f.endsWith('.yaml')).sort();
 
 console.log('Merging', files.length, 'YAML files...');
@@ -39,10 +38,9 @@ files.forEach(file => {
   // Get tag name from filename (without .yaml extension)
   const tagName = file.replace('.yaml', '');
 
-  // Add tag definition with x-displayName for better rendering
-  mergedSpec.tags.push({
+  // Store tag info for later
+  tagMap.set(tagName, {
     name: tagName,
-    'x-displayName': tagName.charAt(0).toUpperCase() + tagName.slice(1),
     description: `APIs from ${file}`
   });
 
@@ -77,6 +75,9 @@ files.forEach(file => {
     }
   }
 });
+
+// Add tags array at the end in the order encountered
+mergedSpec.tags = Array.from(tagMap.values());
 
 fs.writeFileSync(outputJsonFile, JSON.stringify(mergedSpec, null, 2));
 

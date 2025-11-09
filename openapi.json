@@ -7159,74 +7159,59 @@
   "tags": [
     {
       "name": "batchSettlement",
-      "x-displayName": "BatchSettlement",
       "description": "APIs from batchSettlement.yaml"
     },
     {
       "name": "card",
-      "x-displayName": "Card",
       "description": "APIs from card.yaml"
     },
     {
       "name": "customer",
-      "x-displayName": "Customer",
       "description": "APIs from customer.yaml"
     },
     {
       "name": "developer",
-      "x-displayName": "Developer",
       "description": "APIs from developer.yaml"
     },
     {
       "name": "externalAccount",
-      "x-displayName": "ExternalAccount",
       "description": "APIs from externalAccount.yaml"
     },
     {
       "name": "fxrate",
-      "x-displayName": "Fxrate",
       "description": "APIs from fxrate.yaml"
     },
     {
       "name": "kycLink",
-      "x-displayName": "KycLink",
       "description": "APIs from kycLink.yaml"
     },
     {
       "name": "liquidationAddress",
-      "x-displayName": "LiquidationAddress",
       "description": "APIs from liquidationAddress.yaml"
     },
     {
       "name": "prefundedAccount",
-      "x-displayName": "PrefundedAccount",
       "description": "APIs from prefundedAccount.yaml"
     },
     {
       "name": "transactionStatus",
-      "x-displayName": "TransactionStatus",
       "description": "APIs from transactionStatus.yaml"
     },
     {
       "name": "transfer",
-      "x-displayName": "Transfer",
       "description": "APIs from transfer.yaml"
     },
     {
       "name": "virtualAccount",
-      "x-displayName": "VirtualAccount",
       "description": "APIs from virtualAccount.yaml"
     },
     {
       "name": "wallet",
-      "x-displayName": "Wallet",
       "description": "APIs from wallet.yaml"
     },
     {
       "name": "webhook",
-      "x-displayName": "Webhook",
       "description": "APIs from webhook.yaml"
     }
-  ],
-  "x-tagGroups": []
+  ]
 }
