@@ -1,5 +1,5 @@
 import yaml from 'js-yaml';
-import openapiYaml from '../public/openapi.yaml?raw';
+import openapiYaml from './openapi.yaml?raw';
 
-// Parse YAML content and export as JavaScript object
-export const openapiSpec = yaml.load(openapiYaml) as Record<string, any>;
+// Parse YAML content to JavaScript object
+export const openapiSpec = yaml.load(openapiYaml);

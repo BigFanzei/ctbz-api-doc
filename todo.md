@@ -89,18 +89,10 @@ Create an interactive API documentation website from OpenAPI YAML specifications
 - [ ] Verify all pages accessible
 
 
-## Bug Report: Hash routing /#/docs still showing homepage
-- [x] Test /#/docs URL on GitHub Pages
-- [x] Check if hash routing is actually working - WORKING!
-- [x] Verify Swagger UI loads on docs page - LOADS BUT YAML 404
-- [x] Fix openapi.yaml URL to use absolute path
-- [x] Push fix and test - DEPLOYED
-- [x] Issue persists - needs alternative solution (CORS or spec format issue)
-
-
-## New Feature: Inline OpenAPI Spec Loading
+## New Feature: Inline OpenAPI Spec Loading (COMPLETED)
 - [x] Install js-yaml package to parse YAML in JavaScript
-- [x] Create openapi-spec.ts to import and export YAML content
+- [x] Create openapi-spec.ts to import and export YAML content  
+- [x] Move openapi.yaml to src directory for proper Vite import
 - [x] Update ApiDocs.tsx to use spec prop instead of url prop
-- [x] Test on local dev server - SUCCESS!
+- [x] Test on local dev server - SUCCESS! All 63 endpoints loaded perfectly
 - [ ] Push to GitHub and verify on GitHub Pages
