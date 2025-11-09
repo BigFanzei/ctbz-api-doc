@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTBZ API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui.css" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #swagger-ui { max-width: 1460px; margin: 0 auto; }
+        #debug { position: fixed; top: 0; right: 0; background: black; color: lime; padding: 10px; font-family: monospace; font-size: 12px; max-width: 400px; }
+    </style>
+</head>
+<body>
+    <div id="debug">Loading...</div>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
+    <script>
+        const debug = document.getElementById('debug');
+        function log(msg) {
+            console.log(msg);
+            debug.innerHTML += '<br>' + msg;
+        }
+
+        log('Fetching spec...');
+        fetch('./openapi.json?t=' + Date.now())
+            .then(r => {
+                log('Response status: ' + r.status);
+                return r.json();
+            })
+            .then(spec => {
+                log('Spec parsed successfully');
+                log('openapi: ' + spec.openapi);
+                log('title: ' + spec.info.title);
+                log('tags: ' + spec.tags.length);
+                log('paths: ' + Object.keys(spec.paths).length);
+                log('Initializing Swagger UI...');
+                
+                window.ui = SwaggerUIBundle({
+                    spec: spec,
+                    dom_id: '#swagger-ui',
+                    presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                    layout: "StandaloneLayout"
+                });
+                
+                setTimeout(() => {
+                    const errors = window.ui.errSelectors.allErrors().toJS();
+                    log('Errors: ' + errors.length);
+                    if (errors.length > 0) {
+                        log('ERROR DETAILS: ' + JSON.stringify(errors, null, 2));
+                    }
+                }, 2000);
+            })
+            .catch(err => {
+                log('FETCH ERROR: ' + err);
+            });
+    </script>
+</body>
+</html>
