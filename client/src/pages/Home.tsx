@@ -156,7 +156,7 @@ export default function Home() {
                 Browse All APIs
               </Button>
             </Link>
-            <a href="/openapi.yaml" download>
+            <a href="/ctbz-api-doc/openapi.yaml" download>
               <Button size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800 text-lg px-8">
                 <FileText className="mr-2 h-5 w-5" />
                 Download OpenAPI Spec
