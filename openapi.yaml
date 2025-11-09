@@ -1,6 +1,6 @@
 openapi: 3.0.4
 info:
-  title: Complete API Documentation
+  title: CTBZ API Documentation
   version: 1.0.0
   description: 完整的API文档，包含所有端点和模型定义
 servers:
@@ -4680,44 +4680,31 @@ components:
 tags:
   - name: batchSettlement
     description: 批量清算计划创建接口（无示例、无状态码版）
-    x-displayName: Batch Settlement
   - name: card
     description: 卡账户、PIN、移动钱包、交易、授权控制与对账单接口（无示例、无状态码版）
-    x-displayName: Card
   - name: customer
     description: 客户、关联人员、交易与链接相关接口（无示例、无状态码版）
-    x-displayName: Customer
   - name: developer
     description: 组织维度的清算地址费率与费用收款外部账户配置（无示例、无状态码版）
-    x-displayName: Developer
   - name: externalAccount
     description: 客户外部账户的查询、创建、更新、删除与激活
-    x-displayName: External Account
   - name: fxrate
     description: 外汇与加密货币汇率查询接口（无示例、无状态码版）
-    x-displayName: Fxrate
   - name: kycLink
     description: 个体与企业的 KYC 链接管理（无示例、无状态码版）
-    x-displayName: Kyc Link
   - name: liquidationAddress
     description: 清算地址与资金流（Drains）接口（无示例、无状态码版）
-    x-displayName: Liquidation Address
   - name: prefundedAccount
     description: 预充值账户查询与历史记录（无示例、无状态码版）
-    x-displayName: Prefunded Account
   - name: transfer
     description: 平台转账接口（无示例、无状态码版）
-    x-displayName: Transfer
   - name: virtualAccount
     description: 管理虚拟账户（VA）及其资金活动的接口定义（无示例、无状态码版）
-    x-displayName: Virtual Account
   - name: wallet
     description: |
       钱包与交易查询接口（无示例 & 无状态码版）。
       - 统一使用 ISO 8601 UTC 时间（format: date-time）
       - 统一错误结构：code / message / details / trace_id
       - 分页参数：limit / starting_after / ending_before
-    x-displayName: Wallet
   - name: webhook
     description: Webhook 端点管理、事件预览、投递日志与回环测试（无示例、无状态码版）
-    x-displayName: Webhook

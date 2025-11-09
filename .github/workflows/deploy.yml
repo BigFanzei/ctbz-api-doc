@@ -16,7 +16,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,27 +30,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm install
 
-      - name: Build
-        run: pnpm build
+      - name: Build OpenAPI spec
+        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -55,15 +42,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist/public'
+          path: '.'
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
