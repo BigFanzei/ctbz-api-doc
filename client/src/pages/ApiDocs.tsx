@@ -49,8 +49,8 @@ export default function ApiDocs() {
     // 从URL hash中提取标签
     const extractTagFromHash = () => {
       const hash = window.location.hash;
-      // 匹配 #tag/xxx 格式
-      const tagMatch = hash.match(/#tag\/([^/]+)/);
+      // 匹配 #/tag/xxx 格式（Swagger UI使用的格式）
+      const tagMatch = hash.match(/#\/tag\/([^/]+)/);
       return tagMatch ? tagMatch[1] : null;
     };
 
