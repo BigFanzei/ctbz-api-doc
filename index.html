@@ -23,13 +23,16 @@
     <script src="https://unpkg.com/swagger-ui-dist@5.10.5/swagger-ui-standalone-preset.js"></script>
     <script>
         window.onload = function() {
-            console.log('Initializing Swagger UI...');
+            console.log('Initializing Swagger UI v2...');
 
-            // Fetch and embed the spec directly to avoid timing issues
-            fetch('https://bigfanzei.github.io/ctbz-api-doc/openapi.json')
+            // Fetch spec with cache busting
+            const cacheBust = new Date().getTime();
+            fetch('https://bigfanzei.github.io/ctbz-api-doc/openapi.json?t=' + cacheBust)
                 .then(response => response.json())
                 .then(spec => {
                     console.log('Spec loaded, version:', spec.openapi);
+                    console.log('Tags:', spec.tags?.length);
+                    console.log('Paths:', Object.keys(spec.paths || {}).length);
 
                     window.ui = SwaggerUIBundle({
                         spec: spec,
@@ -48,7 +51,7 @@
                         tryItOutEnabled: true
                     });
 
-                    console.log('✅ Swagger UI initialized with spec');
+                    console.log('✅ Swagger UI initialized with embedded spec');
                 })
                 .catch(err => {
                     console.error('Failed to load spec:', err);
